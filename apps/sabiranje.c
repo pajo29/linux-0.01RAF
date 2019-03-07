@@ -53,6 +53,7 @@ int main(int argc, char **argv)
 	}
 
 
+	resString[i++] = '\n';
 	resString[i] = '\0';
 	write(1, resString, strlen(resString));	
 
