@@ -1,2 +1,3 @@
 # linux-0.01RAF
-Course 'Operating Systems' linux
+
+College project, constantly working and upgrading linux-0.1. 
