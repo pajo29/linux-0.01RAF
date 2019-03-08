@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	
 	i++;
 
-	while(i < strlen(line))
+	while(i < strlen(line)-1)
 	{
 		secondNum = secondNum * 10 + (line[i] - '0');
 		i++;
@@ -53,6 +53,7 @@ int main(int argc, char **argv)
 	}
 
 
+	resString[i++] = '\n';
 	resString[i] = '\0';
 	write(1, resString, strlen(resString));	
 
