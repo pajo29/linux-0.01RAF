@@ -32,10 +32,36 @@ void unos_kvadrat()
 
 int obim_kvadrat()
 {
-	write(1, "Unesite stranicu za racunanje:\n", strlen("Unesite stranicu za racunanje:\n"));
+	if(a == 0)
+	{
+	write(1, "Stranica nije validna, ponoviti unos.\n", strlen("Stranica nije validna, ponoviti unos.\n"));
+	return 0;
+	}
+
+	__asm__(
+		"movl %1, %%ebx;"
+		"imull %%ebx, %%eax;"
+		: "=a" (obim)
+		: "g" (4)	
+	);
+
+
+	return obim;
 }
 
 int povrsina_kvadrat()
 {
-	write(1, "Unesite stranicu za racunanje:\n", strlen("Unesite stranicu za racunanje:\n"));
+	if(a == 0)
+	{
+	write(1, "Stranica nije validna, ponoviti unos.\n", strlen("Stranica nije validna, ponoviti unos.\n"));
+	return 0;
+	}
+
+	__asm__(
+		"imull %%eax, %%eax;"
+		:"=a" (povrsina)
+		:"a" (a)	
+	);
+
+	return povrsina;
 }

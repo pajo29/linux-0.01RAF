@@ -8,7 +8,7 @@ int povrsina_trougao();
 
 void unos_kvadrat();
 int obim_kvadrat();
-int povrsina_trougao();
+int povrsina_kvadrat();
 
 void unos_krug();
 int obim_krug();

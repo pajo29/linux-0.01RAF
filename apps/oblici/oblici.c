@@ -13,7 +13,51 @@
 
 int main(int argc, char** argv)
 {
-	unos_kvadrat();
+	write(1, "Koji oblik zelite racunati?\n[1] Trougao(pravougli)\n[2] Kvadrat\n[3] Krug\n", strlen("Koji oblik zelite racunati?\n[1] Trougao(pravougli)\n[2] Kvadrat\n[3] Krug\n"));
+
+	char buff[BUFFER_SIZE];
+
+	read(0, buff, BUFFER_SIZE);
+
+	int i = atoi(buff);
+
+	void (*unos)();
+	int (*obim)();
+	int (*povrsina)();
+
+	switch(i)
+	{
+	case 1:
+		unos = unos_trougao;
+		obim = obim_trougao;
+		povrsina = povrsina_trougao;
+		break;
+	case 2:
+		unos = unos_kvadrat;
+		obim = obim_kvadrat;
+		povrsina = povrsina_kvadrat;
+		break;
+	case 3:
+		unos = unos_krug;
+		obim = obim_krug;
+		povrsina = povrsina_krug;
+		break;
+	}
+
+	unos();
+	int o = obim();
+	int p = povrsina();
+	
+	char oC[BUFFER_SIZE];
+	char pC[BUFFER_SIZE];
+
+	int len = itoa(o, oC);
+	write(1, "Izracunat obim je: ", strlen("Izracunat obim je: "));
+	write(1, oC, len);
+	write(1, ", a povrsina: ", strlen(", a povrsina: "));
+	len = itoa(p, pC);
+	write(1, pC, len);
+	write_new_line();
 
 	_exit(0);
 }

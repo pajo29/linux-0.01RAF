@@ -16,6 +16,8 @@ void unos_kvadrat()
 	
 	char buffer[BUFFER_SIZE];
 
+	read(0, buffer, BUFFER_SIZE);
+
 	a = atoi(buffer);
 
 	char aC[10];
@@ -30,10 +32,37 @@ void unos_kvadrat()
 
 int obim_kvadrat()
 {
-	write(1, "Unesite stranicu za racunanje:\n", strlen("Unesite stranicu za racunanje:\n"));
+	if(a == 0)
+	{
+	write(1, "Stranica nije validna, ponoviti unos.\n", strlen("Stranica nije validna, ponoviti unos.\n"));
+	return 0;
+	}
+
+	__asm__(
+		"movl %1, %%ebx;"
+		"imull %%ebx, %%eax;"
+		: "=a" (obim)
+		: "g" (4)	
+	);
+
+
+	return obim;
 }
 
 int povrsina_kvadrat()
 {
-	write(1, "Unesite stranicu za racunanje:\n", strlen("Unesite stranicu za racunanje:\n"));
+	if(a == 0)
+	{
+	write(1, "Stranica nije validna, ponoviti unos.\n", strlen("Stranica nije validna, ponoviti unos.\n"));
+	return 0;
+	}
+
+	__asm__(
+		"movl %1, %%ebx;"
+		"imull %%ebx, %%eax;"
+		: "=a" (obim)
+		: "g" (4)	
+	);
+
+	return povrsina;
 }
