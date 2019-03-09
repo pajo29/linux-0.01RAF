@@ -1,0 +1,17 @@
+#ifndef OBLICI_H_INCLUDED
+#define OBLICI_H_INCLUDED
+
+
+void unos_trougao();
+void obim_trougao();
+void povrsina_trougao();
+
+void unos_kvadrat();
+void obim_kvadrat();
+void povrsina_trougao();
+
+void unos_krug();
+void obim_krug();
+void povrsina_krug();
+
+#endif
