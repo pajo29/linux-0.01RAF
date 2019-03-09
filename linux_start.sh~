@@ -1,4 +1,4 @@
 #!/bin/bash
 echo Starting...
+echo 'Uspesno kompajliranje, mozete pokrenuti QEMU'
 qemu-system-i386 -hdb hd_oldlinux.img -fda Image -boot a
-fi

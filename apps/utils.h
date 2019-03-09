@@ -56,10 +56,13 @@ int itoa(int n, char *buf)
 int atoi(const char *buf)
 {
 	int r = 0, i;
-	for(i = 0; __isdigit(buf[i]); ++i)
+	for(i = 0; __isdigit(buf[i]); i++)
 		r = r * 10 + buf[i] - '0';
 	return r;
 }
+
+void write_new_line()
+{ write(1, "\n", strlen("\n")); }
 
 
 #endif
