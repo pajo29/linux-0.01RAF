@@ -17,7 +17,13 @@
 static char scan_code_firt_row[SCAN_CODE_SIZE];
 static char scan_code_second_row[SCAN_CODE_SIZE];
 
+static char mnemonic_key[SCAN_CODE_SIZE];
+static char *mnemonic[SCAN_CODE_SIZE];
+
+
 void check_for_files(int file_TBL, int file_MN);
+void length_check(const char *buffer);
+
 
 void load_config(const char *scancodes_filename, const char *mnemonic_filename)
 {
@@ -28,8 +34,47 @@ void load_config(const char *scancodes_filename, const char *mnemonic_filename)
 
     check_for_files(file_TBL, file_MN);
 
+    char buffer_first_line[SCAN_CODE_SIZE];
+    char buffer_second_line[SCAN_CODE_SIZE];
+
+    int len = fgets(buffer_first_line, SCAN_CODE_SIZE, file_TBL);
+        fgets(buffer_second_line, SCAN_CODE_SIZE, file_TBL);
+
+    int i;
+    for(i = 0; i < len; i++)
+    {
+        scan_code_firt_row[i] = buffer_first_line[i];
+        scan_code_second_row[i] = buffer_second_line[i];
+    }
+
+    char mn_num[3];
+    fgets(mn_num, 3, file_MN);
+
+    len = atoi(mn_num);
+
+    for(i = 0; i < len; i++)
+    {
+        int n = fgets(buffer_first_line, SCAN_CODE_SIZE, file_MN); //NE RADI, SREDITI
+        mnemonic_key[i] = buffer_first_line[0];
+        int j;
+        char tmp[SCAN_CODE_SIZE];
+        int k;
+        for(j = 2; j < n; j++)
+        {
+            k = 0;
+            tmp[k++] = buffer_first_line[j];
+        }
+        tmp[k] = '\0';
+        printstr("\n");
+        printstr(tmp);
+        strcpy(mnemonic[i], tmp);
+    }
 
 
+
+
+    close(file_TBL);
+    close(file_MN);
 }
 
 int process_scancode(int scancode, char *buffer)
@@ -40,6 +85,7 @@ int process_scancode(int scancode, char *buffer)
 		Your code goes here!
 		Remember, only inline assembly.
 		Good luck!
+		P: Thanks! :D
 	*/
 
 	return result;
@@ -65,3 +111,12 @@ void check_for_files(int file_TBL, int file_MN)
 
     write_new_line();
 }
+
+/* void length_check(const char *buffer)
+{
+    if( > SCAN_CODE_SIZE)
+    {
+        printerr("Array in file to large. Exiting.");
+        _exit(1);
+    }
+} */
