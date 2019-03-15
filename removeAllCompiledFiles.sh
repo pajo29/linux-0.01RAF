@@ -8,4 +8,4 @@ sudo rm * -f
 cd ../..
 sudo umount tmp_hd
 sudo rmdir tmp_hd
-echo 'All .bin files deleted.'
+echo 'All files deleted.'
