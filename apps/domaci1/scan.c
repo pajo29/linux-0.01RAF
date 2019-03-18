@@ -54,7 +54,7 @@ void load_config(const char *scancodes_filename, const char *mnemonic_filename)
 
     for(i = 0; i < len; i++)
     {
-        int n = fgets(buffer_first_line, SCAN_CODE_SIZE, file_MN); //NE RADI, SREDITI
+        int n = fgets(buffer_first_line, SCAN_CODE_SIZE, file_MN);
         mnemonic_key[i] = buffer_first_line[0];
         int j;
         char tmp[SCAN_CODE_SIZE];
@@ -64,8 +64,6 @@ void load_config(const char *scancodes_filename, const char *mnemonic_filename)
             tmp[k++] = buffer_first_line[j];
         }
         tmp[k] = '\0';
-        printstr("\n");
-        printstr(tmp);
         strcpy(mnemonic[i], tmp);
     }
 
