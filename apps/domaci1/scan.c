@@ -58,10 +58,9 @@ void load_config(const char *scancodes_filename, const char *mnemonic_filename)
         mnemonic_key[i] = buffer_first_line[0];
         int j;
         char tmp[SCAN_CODE_SIZE];
-        int k;
-        for(j = 2; j < n; j++)
+        int k = 0;
+        for(j = 2; j < n - 1; j++)
         {
-            k = 0;
             tmp[k++] = buffer_first_line[j];
         }
         tmp[k] = '\0';
@@ -69,9 +68,6 @@ void load_config(const char *scancodes_filename, const char *mnemonic_filename)
         printstr(tmp);
         strcpy(mnemonic[i], tmp);
     }
-
-
-
 
     close(file_TBL);
     close(file_MN);
