@@ -20,13 +20,17 @@ static char scan_code_second_row[SCAN_CODE_SIZE];
 static char mnemonic_key[SCAN_CODE_SIZE];
 static char *mnemonic[SCAN_CODE_SIZE];
 
+static int shift_flag;
+static int ctrl_flag;
+static int alt_flag;
+
 
 void check_for_files(int file_TBL, int file_MN);
-void length_check(const char *buffer);
 
 
 void load_config(const char *scancodes_filename, const char *mnemonic_filename)
 {
+    shift_flag = ctrl_flag = alt_flag = 0;
     write_new_line();
 
     int file_TBL = open(scancodes_filename, O_RDONLY);
@@ -75,12 +79,7 @@ int process_scancode(int scancode, char *buffer)
 {
 	int result;
 
-	/*
-		Your code goes here!
-		Remember, only inline assembly.
-		Good luck!
-		P: Thanks! :D
-	*/
+
 
 
 	return result;
@@ -107,11 +106,3 @@ void check_for_files(int file_TBL, int file_MN)
     write_new_line();
 }
 
-/* void length_check(const char *buffer)
-{
-    if( > SCAN_CODE_SIZE)
-    {
-        printerr("Array in file to large. Exiting.");
-        _exit(1);
-    }
-} */
