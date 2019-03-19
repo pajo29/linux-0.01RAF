@@ -1,5 +1,6 @@
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "scan.h"
 
@@ -7,6 +8,7 @@
 #include "../utils.h"
 
 #define BUFFER_SIZE 128
+#define OUT_BUFFER_SIZE 1024
 
 
 int main(int argc, char *argv[])
@@ -31,13 +33,46 @@ int main(int argc, char *argv[])
     buff_MN[strlen(buff_MN) - 1] = '\0';
     load_config(buff_TBL, buff_MN);
 
+    char sc_file[BUFFER_SIZE];
+
+    printstr("\nUnesite naziv sc datoteke: ");
+    read(0, sc_file, BUFFER_SIZE);
+    sc_file[strlen(sc_file) - 1] = '\0';
+
+    int file = open(sc_file, O_RDONLY);
+
+    if(file == -1)
+    {
+        printstr("Fajl ne postoji.");
+        _exit(1);
+    }
+
+    char code[3];
+    char out_buffer[OUT_BUFFER_SIZE];
+
+    char test1[3];
+    strcpy(test1, "400");
+    char test[100];
+    fgets(code, 3, file);
+    code[strlen(code) - 1] = '\0';
+    itoa(strcmp(test1, code), test);
+    printstr(test);
+
+    /*while(strcmp(code, "400") != 0)
+    {
+        fgets(code, 3, file);
+        process_scancode(atoi(code), out_buffer);
+        write_new_line();
+        printstr(code);
+    }*/
+
+    close(file);
+
+
+
 
 
     _exit(0);
-	/* ucitavanje podesavanja */
 
-	/* ponavljamo: */
-		/* ucitavanje i otvaranje test fajla */
-		/* parsiranje fajla, obrada scanecodova, ispis */
 
 }
