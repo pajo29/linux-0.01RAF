@@ -7,6 +7,10 @@ sudo mount -o loop,offset=10240 hd_oldlinux.img tmp_hd
 sudo cp apps/domaci1/domaci1.bin tmp_hd/root
 sudo cp apps/domaci1/scancodes.tbl tmp_hd/root
 sudo cp apps/domaci1/test1.tst tmp_hd/root
+
+sudo cp apps/domaci1/testfajl1.tst tmp_hd/root
+sudo cp apps/domaci1/testfajl.tst tmp_hd/root
+
 sudo cp apps/domaci1/ctrl.map tmp_hd/root
 sleep .5
 sudo umount tmp_hd

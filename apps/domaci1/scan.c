@@ -80,10 +80,14 @@ int process_scancode(int scancode, char *buffer)
 	int result = 0;
 	int a;
 
-    __asm__(
-            //"movl %3, %%eax;" //used to compare sc-values
-            //"movl %4, %%ebx;"
-            //"movl %5, %%ecx;"
+    __asm__ __volatile__(
+            /*"cld;"
+            "movl %15, %%eax;"
+            "movl %6, %%ebx;"
+            "cmpl %%eax, %%ebx;"
+            "je end_of_file;"*/ //TO BE USED WHEN FILE REACHES 400
+
+            ".section .text;"
             "movl %14, %%edx;" //flag_used
 
             //CTRL/SHIFT/ALT TESTS
@@ -93,7 +97,7 @@ int process_scancode(int scancode, char *buffer)
             "pushl %%edx;"
             "movl %6, %%eax;"
             "movl %7, %%edx;"
-            "cmp %%eax, %%edx;"
+            "cmpl %%eax, %%edx;"
             "popl %%edx;"
             "popl %%eax;"
             "je shift_down;"
@@ -103,7 +107,7 @@ int process_scancode(int scancode, char *buffer)
             "pushl %%edx;"
             "movl %6, %%eax;"
             "movl %8, %%edx;"
-            "cmp %%eax, %%edx;"
+            "cmpl %%eax, %%edx;"
             "popl %%edx;"
             "popl %%eax;"
             "je shift_up;"
@@ -113,7 +117,7 @@ int process_scancode(int scancode, char *buffer)
             "pushl %%edx;"
             "movl %6, %%eax;"
             "movl %9, %%edx;"
-            "cmp %%eax, %%edx;"
+            "cmpl %%eax, %%edx;"
             "popl %%edx;"
             "popl %%eax;"
             "je ctrl_down;"
@@ -123,7 +127,7 @@ int process_scancode(int scancode, char *buffer)
             "pushl %%edx;"
             "movl %6, %%eax;"
             "movl %10, %%edx;"
-            "cmp %%eax, %%edx;"
+            "cmpl %%eax, %%edx;"
             "popl %%edx;"
             "popl %%eax;"
             "je ctrl_up;"
@@ -133,7 +137,7 @@ int process_scancode(int scancode, char *buffer)
             "pushl %%edx;"
             "movl %6, %%eax;"
             "movl %11, %%edx;"
-            "cmp %%eax, %%edx;"
+            "cmpl %%eax, %%edx;"
             "popl %%edx;"
             "popl %%eax;"
             "je alt_down;"
@@ -143,12 +147,12 @@ int process_scancode(int scancode, char *buffer)
             "pushl %%edx;"
             "movl %6, %%eax;"
             "movl %12, %%edx;"
-            "cmp %%eax, %%edx;"
+            "cmpl %%eax, %%edx;"
             "popl %%edx;"
             "popl %%eax;"
             "je alt_up;"
 
-            "jmp end;"
+            "jmp no_flags;"
 
             //FLAG_JUMPS
 
@@ -182,30 +186,46 @@ int process_scancode(int scancode, char *buffer)
             "movl %13, %%edx;"
             "jmp end;"
 
-            "end:"
+            "no_flags:"
+            "pushl %%edx;" //POPOVATI OBAVEZNO
+            //"movl $0x0, %%edx;" //Using dx as counter for result
+
+            "cld;"
+            "movl %13, %%edx;"
+            "cmpl %%eax, %%edx;"
+            "je shift_flag_down;" //UBACITI PROVERU DA LI JE CTRL DOWN, ZA CTRL ONLY DOWN
+
+            "shift_flag_down:"
+
+            "movl %14, %%edx;"
+            "cmpl %%ebx, %%edx"
+            "je shift_and_ctrl_down;"
+
+            ""//UBACITI UPIS NA BUFFER U ZAVISNOSTI OD IZABRANOG SC-A
+
+
+
+            "shift_and_ctrl_down:"
             ""
+            //"pushl %%eax;" //Storing shift/ctrl/alt flags
+            //"pushl %%ebx;"
+            //"pushl %%ecx;"
+
+            //"end_of_file:"//TO BE USED WHEN FILE REACHED 400
+
+            "end:"
+
             : "=a" (shift_flag), "=b" (ctrl_flag), "=c" (alt_flag)
             : "a" (shift_flag), "b"(ctrl_flag), "c"(alt_flag), "g" (scancode),
-              "g" (200), "g" (300), "g" (201), "g" (301), "g" (202), "g" (302), "g" (1), "g" (0)
+              "g" (200), "g" (300), "g" (201), "g" (301), "g" (202), "g" (302), "g" (1), "g" (0), "g" (400)
             : "%edx", "memory"
             );
 
-    char A[5];
-    char B[5];
+
     char C[5];
-
-    itoa(shift_flag, A);
-    itoa(ctrl_flag, B);
     itoa(alt_flag, C);
-
     write_new_line();
-    printstr(A);
-    printstr("|");
-    printstr(B);
-    printstr("|");
     printstr(C);
-
-
 
 	return result;
 }
