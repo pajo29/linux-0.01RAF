@@ -64,8 +64,6 @@ int main(int argc, char *argv[])
 
 
     _exit(0);
-
-
 }
 
 int end_of_file_check(const char *code)

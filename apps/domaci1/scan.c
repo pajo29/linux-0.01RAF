@@ -20,9 +20,9 @@ static char scan_code_second_row[SCAN_CODE_SIZE];
 static char mnemonic_key[SCAN_CODE_SIZE];
 static char *mnemonic[SCAN_CODE_SIZE];
 
-static int shift_flag;
-static int ctrl_flag;
-static int alt_flag;
+static volatile int shift_flag;
+static volatile int ctrl_flag;
+static volatile int alt_flag;
 
 
 void check_for_files(int file_TBL, int file_MN);
@@ -77,8 +77,133 @@ void load_config(const char *scancodes_filename, const char *mnemonic_filename)
 
 int process_scancode(int scancode, char *buffer)
 {
-	int result;
+	int result = 0;
+	int a;
 
+    __asm__(
+            //"movl %3, %%eax;" //used to compare sc-values
+            //"movl %4, %%ebx;"
+            //"movl %5, %%ecx;"
+            "movl %14, %%edx;" //flag_used
+
+            //CTRL/SHIFT/ALT TESTS
+
+            "cld;" //shift down compare
+            "pushl %%eax;"
+            "pushl %%edx;"
+            "movl %6, %%eax;"
+            "movl %7, %%edx;"
+            "cmp %%eax, %%edx;"
+            "popl %%edx;"
+            "popl %%eax;"
+            "je shift_down;"
+
+            "cld;" //shift up compare
+            "pushl %%eax;"
+            "pushl %%edx;"
+            "movl %6, %%eax;"
+            "movl %8, %%edx;"
+            "cmp %%eax, %%edx;"
+            "popl %%edx;"
+            "popl %%eax;"
+            "je shift_up;"
+
+            "cld;" //ctrl down compare
+            "pushl %%eax;"
+            "pushl %%edx;"
+            "movl %6, %%eax;"
+            "movl %9, %%edx;"
+            "cmp %%eax, %%edx;"
+            "popl %%edx;"
+            "popl %%eax;"
+            "je ctrl_down;"
+
+            "cld;" //ctrl up compare
+            "pushl %%eax;"
+            "pushl %%edx;"
+            "movl %6, %%eax;"
+            "movl %10, %%edx;"
+            "cmp %%eax, %%edx;"
+            "popl %%edx;"
+            "popl %%eax;"
+            "je ctrl_up;"
+
+            "cld;" //alt down compare
+            "pushl %%eax;"
+            "pushl %%edx;"
+            "movl %6, %%eax;"
+            "movl %11, %%edx;"
+            "cmp %%eax, %%edx;"
+            "popl %%edx;"
+            "popl %%eax;"
+            "je alt_down;"
+
+            "cld;" //alt up compare
+            "pushl %%eax;"
+            "pushl %%edx;"
+            "movl %6, %%eax;"
+            "movl %12, %%edx;"
+            "cmp %%eax, %%edx;"
+            "popl %%edx;"
+            "popl %%eax;"
+            "je alt_up;"
+
+            "jmp end;"
+
+            //FLAG_JUMPS
+
+            "shift_down:"
+            "movl %13, %%eax;"
+            "movl %13, %%edx;"
+            "jmp end;"
+
+            "shift_up:"
+            "movl %14, %%eax;"
+            "movl %13, %%edx;"
+            "jmp end;"
+
+            "ctrl_down:"
+            "movl %13, %%ebx;"
+            "movl %13, %%edx;"
+            "jmp end;"
+
+            "ctrl_up:"
+            "movl %14, %%ebx;"
+            "movl %13, %%edx;"
+            "jmp end;"
+
+            "alt_down:"
+            "movl %13, %%ecx;"
+            "movl %13, %%edx;"
+            "jmp end;"
+
+            "alt_up:"
+            "movl %14, %%ecx;"
+            "movl %13, %%edx;"
+            "jmp end;"
+
+            "end:"
+            ""
+            : "=a" (shift_flag), "=b" (ctrl_flag), "=c" (alt_flag)
+            : "a" (shift_flag), "b"(ctrl_flag), "c"(alt_flag), "g" (scancode),
+              "g" (200), "g" (300), "g" (201), "g" (301), "g" (202), "g" (302), "g" (1), "g" (0)
+            : "%edx", "memory"
+            );
+
+    char A[5];
+    char B[5];
+    char C[5];
+
+    itoa(shift_flag, A);
+    itoa(ctrl_flag, B);
+    itoa(alt_flag, C);
+
+    write_new_line();
+    printstr(A);
+    printstr("|");
+    printstr(B);
+    printstr("|");
+    printstr(C);
 
 
 
@@ -105,4 +230,5 @@ void check_for_files(int file_TBL, int file_MN)
 
     write_new_line();
 }
+
 
