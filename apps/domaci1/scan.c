@@ -18,7 +18,7 @@ static char scan_code_firt_row[SCAN_CODE_SIZE];
 static char scan_code_second_row[SCAN_CODE_SIZE];
 
 static char mnemonic_key[SCAN_CODE_SIZE];
-static char *mnemonic[SCAN_CODE_SIZE];
+static char mnemonic[SCAN_CODE_SIZE][SCAN_CODE_SIZE];
 
 static volatile int shift_flag;
 static volatile int ctrl_flag;
@@ -87,7 +87,6 @@ int process_scancode(int scancode, char *buffer)
             "cmpl %%eax, %%ebx;"
             "je end_of_file;"*/ //TO BE USED WHEN FILE REACHES 400
 
-            ".section .text;"
             "movl %14, %%edx;" //flag_used
 
             //CTRL/SHIFT/ALT TESTS
@@ -187,7 +186,7 @@ int process_scancode(int scancode, char *buffer)
             "jmp end;"
 
             "no_flags:"
-            "pushl %%edx;" //POPOVATI OBAVEZNO
+            //"pushl %%edx;" //POPOVATI OBAVEZNO
             //"movl $0x0, %%edx;" //Using dx as counter for result
 
             "cld;"
@@ -197,12 +196,19 @@ int process_scancode(int scancode, char *buffer)
 
             "shift_flag_down:"
 
-            "movl %14, %%edx;"
-            "cmpl %%ebx, %%edx"
+            "movl %13, %%edx;"
+            "cmpl %%ebx, %%edx;"
             "je shift_and_ctrl_down;"
 
-            ""//UBACITI UPIS NA BUFFER U ZAVISNOSTI OD IZABRANOG SC-A
-
+            //UBACITI UPIS NA BUFFER U ZAVISNOSTI OD IZABRANOG SC-A
+            "cld;"
+            "leal (scan_code_second_row), %%esi;"
+            "pushl %%eax;"
+            //"add (scancode), %%esi;"
+            "lodsb;"
+            //"leal (buffer), %%edi;"
+            "stosb;"
+            ""
 
 
             "shift_and_ctrl_down:"
@@ -217,12 +223,13 @@ int process_scancode(int scancode, char *buffer)
 
             : "=a" (shift_flag), "=b" (ctrl_flag), "=c" (alt_flag)
             : "a" (shift_flag), "b"(ctrl_flag), "c"(alt_flag), "g" (scancode),
-              "g" (200), "g" (300), "g" (201), "g" (301), "g" (202), "g" (302), "g" (1), "g" (0), "g" (400)
+              "g" (200), "g" (300), "g" (201), "g" (301), "g" (202), "g" (302), "g" (1), "g" (0), "g" (400),
+              "g" (scan_code_firt_row), "g" (scan_code_second_row)
             : "%edx", "memory"
             );
 
 
-    char C[5];
+    char C[5];//USED FOR TESTING
     itoa(alt_flag, C);
     write_new_line();
     printstr(C);
