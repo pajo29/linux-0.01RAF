@@ -35,7 +35,7 @@ int fgets(char *buffer, int maxlen, int fd);
 
 #define printstr(x) write(1, x, strlen(x));
 #define printerr(x) write(2, x, strlen(x));
-#define write_new_line() write(1, "\n", strlen("\n"));
+#define println() write(1, "\n", strlen("\n"));
 
 #ifdef UTIL_IMPLEMENTATION
 

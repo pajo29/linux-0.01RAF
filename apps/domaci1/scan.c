@@ -14,7 +14,7 @@
 
 #define SCAN_CODE_SIZE 128
 
-static char scan_code_firt_row[SCAN_CODE_SIZE];
+static char scan_code_first_row[SCAN_CODE_SIZE];
 static char scan_code_second_row[SCAN_CODE_SIZE];
 
 static char mnemonic_key[SCAN_CODE_SIZE];
@@ -24,7 +24,7 @@ static int shift_flag;
 static int ctrl_flag;
 static int alt_flag;
 
-static int result_global = 0;
+static int volatile result_global = 0;
 
 
 void check_for_files(int file_TBL, int file_MN);
@@ -33,7 +33,7 @@ void check_for_files(int file_TBL, int file_MN);
 void load_config(const char *scancodes_filename, const char *mnemonic_filename)
 {
     shift_flag = ctrl_flag = alt_flag = 0;
-    write_new_line();
+    println();
 
     int file_TBL = open(scancodes_filename, O_RDONLY);
     int file_MN = open(mnemonic_filename, O_RDONLY);
@@ -49,7 +49,7 @@ void load_config(const char *scancodes_filename, const char *mnemonic_filename)
     int i;
     for(i = 0; i < len; i++)
     {
-        scan_code_firt_row[i] = buffer_first_line[i];
+        scan_code_first_row[i] = buffer_first_line[i];
         scan_code_second_row[i] = buffer_second_line[i];
     }
 
@@ -84,17 +84,15 @@ int process_scancode(int scancode, char *buffer)
 
 
     __asm__ __volatile__(
-            /*"cld;"
-            "movl %15, %%eax;"
-            "movl %6, %%ebx;"
+            "cld;"
+            "movl %0, %%eax;"
+            "movl $400, %%ebx;"
             "cmpl %%eax, %%ebx;"
-            "je end_of_file;"*/ //TO BE USED WHEN FILE REACHES 400
-
-            //"movl %14, %%edx;" //flag_used
+            "je end;" //TO BE USED WHEN FILE REACHES 400
 
             //CTRL/SHIFT/ALT TESTS
 
-            "cld;" //shift down compare
+            //shift down compare
             "movl %0, %%eax;"
             "movl $200, %%edx;"
             "cmpl %%eax, %%edx;"
@@ -178,7 +176,7 @@ int process_scancode(int scancode, char *buffer)
             //UBACITI UPIS NA BUFFER U ZAVISNOSTI OD IZABRANOG SC-A
             "cld;"
             "lea (scan_code_second_row), %%esi;"
-            //"add %3, %%esi;"
+            "add %0, %%esi;"
             "lodsb;"
             "lea %1, %%edi;"
             "stosb;"
@@ -194,8 +192,9 @@ int process_scancode(int scancode, char *buffer)
 
             :
             : "g" (scancode), "g" (buffer)
-            : "%edx", "%esi", "%edi", "memory"
+            : "%edx", "%esi", "%edi", "memory", "%eax", "%ebx", "%ecx"
             );
+
 
 
     buffer[result_global] = '\0';
@@ -237,7 +236,7 @@ void check_for_files(int file_TBL, int file_MN)
     else
         printstr("\nMnemonic file found.");
 
-    write_new_line();
+    println();
 }
 
 
