@@ -24,6 +24,8 @@ static int shift_flag;
 static int ctrl_flag;
 static int alt_flag;
 
+static int result_global = 0;
+
 
 void check_for_files(int file_TBL, int file_MN);
 
@@ -180,7 +182,7 @@ int process_scancode(int scancode, char *buffer)
             "lodsb;"
             "lea %1, %%edi;"
             "stosb;"
-            "movl $1, %2;"
+            "movl $1, (result_global);"
 
 
             "shift_and_ctrl_down:"
@@ -191,12 +193,12 @@ int process_scancode(int scancode, char *buffer)
             "end:"
 
             :
-            : "g" (scancode), "g" (buffer), "g" (result)
+            : "g" (scancode), "g" (buffer)
             : "%edx", "%esi", "%edi", "memory"
             );
 
 
-    buffer[1] = '\0';
+    buffer[result_global] = '\0';
     printstr(buffer);
     /*char sc_a[4];
     char sc_b[4];
@@ -213,6 +215,7 @@ int process_scancode(int scancode, char *buffer)
     printstr(" | ");
     printstr(sc_c);*/
 
+    result = result_global;
 	return result;
 }
 
