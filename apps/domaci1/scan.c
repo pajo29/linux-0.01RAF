@@ -175,7 +175,6 @@ int process_scancode(int scancode, char *buffer)
 
             //UBACITI UPIS NA BUFFER U ZAVISNOSTI OD IZABRANOG SC-A
             "cld;"
-            "movl $0x0, %%eax;"
             "leal (scan_code_second_row), %%esi;"
             "add %3, %%esi;"
             "lodsb;"
@@ -193,7 +192,7 @@ int process_scancode(int scancode, char *buffer)
 
             :
             : "a" (shift_flag), "b"(ctrl_flag), "c"(alt_flag), "g" (scancode), "g" (buffer), "g" (result)
-            : "%edx", "memory"
+            : "%edx", "%esi", "%edi", "memory"
             );
 
 
