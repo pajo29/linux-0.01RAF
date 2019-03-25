@@ -80,7 +80,7 @@ void load_config(const char *scancodes_filename, const char *mnemonic_filename)
 
 int process_scancode(int scancode, char *buffer)
 {
-	int result = 0;
+	int result = result_global = 0;
 	int a;
 
 
@@ -198,15 +198,31 @@ int process_scancode(int scancode, char *buffer)
             "movl $1, (result_global);"
             "jmp end;"
 
+            "found_key:"
+            "cld;"
+            "lea (mnemonic), %%esi;"
+            "xorl %%edx, %%edx;"
+            "movl %0, %%eax;"
+            "imull %%ebx;"
+            "movl $34, (result_global);"
+
             "shift_and_ctrl_down:"
             "cld;"
             "movl (mnemonic_size), %%ecx;"
             "incl %%ecx;"
             "lea (mnemonic_key), %%esi;"
-            ""
+            "lea (scan_code_second_row), %%edi;"
+            "add %0, %%edi;"
+            "xorl %%ebx, %%ebx;"
+
             "loop:"
-            ""
+            "cmpsb;"
+            "je found_key;"
             "decl %%ecx;"
+            "incl %%ebx;"
+            "cmpl $0, %%ecx;"
+            "jne loop;"
+
 
             "shift_flag_up_ctrl_flag_down:"
 
@@ -221,7 +237,10 @@ int process_scancode(int scancode, char *buffer)
 
 
 
-    buffer[result_global] = '\0';
+    char test[30];
+    itoa(result_global, test);
+    printstr(test);
+    //buffer[result_global] = '\0';
     /*char sc_a[4];
     char sc_b[4];
     char sc_c[4];
