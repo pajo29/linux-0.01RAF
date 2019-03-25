@@ -11,6 +11,7 @@
 #define OUT_BUFFER_SIZE 1024
 
 int end_of_file_check(const char *code);
+void empty_buff(char *buff);
 
 
 int main(int argc, char *argv[])
@@ -41,7 +42,7 @@ int main(int argc, char *argv[])
     //printstr("\nUnesite naziv sc datoteke: ");
     //read(0, sc_file, BUFFER_SIZE);
     //sc_file[strlen(sc_file) - 1] = '\0';
-    strcpy(sc_file, "testfajl1.tst");
+    strcpy(sc_file, "test1.tst");
 
     int file = open(sc_file, O_RDONLY);
 
@@ -58,6 +59,10 @@ int main(int argc, char *argv[])
     {
         fgets(code, 4, file);
         process_scancode(atoi(code), out_buffer); //ISPIS BUFFERA SVAKI PUT
+        printstr(out_buffer);
+        //printstr(" ");
+        empty_buff(out_buffer);
+
     }
 
     close(file);
@@ -69,4 +74,13 @@ int main(int argc, char *argv[])
 int end_of_file_check(const char *code)
 {
     return *code == '4' ? *++code == '0' ? *++code == '0' ? 0 : 1 : 1 : 1;
+}
+
+void empty_buff(char *buff)
+{
+    int i = 0;
+    for(i = 0; i < 1024; i++)
+    {
+        buff[i] = '\0';
+    }
 }

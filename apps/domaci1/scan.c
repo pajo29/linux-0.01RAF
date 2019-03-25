@@ -17,6 +17,7 @@
 static char scan_code_first_row[SCAN_CODE_SIZE];
 static char scan_code_second_row[SCAN_CODE_SIZE];
 
+static int mnemonic_size = 0;
 static char mnemonic_key[SCAN_CODE_SIZE];
 static char mnemonic[SCAN_CODE_SIZE][64];
 
@@ -56,9 +57,9 @@ void load_config(const char *scancodes_filename, const char *mnemonic_filename)
     char mn_num[3];
     fgets(mn_num, 3, file_MN);
 
-    len = atoi(mn_num);
+    mnemonic_size = atoi(mn_num);
 
-    for(i = 0; i < len; i++)
+    for(i = 0; i < mnemonic_size; i++)
     {
         int n = fgets(buffer_first_line, SCAN_CODE_SIZE, file_MN);
         mnemonic_key[i] = buffer_first_line[0];
@@ -167,6 +168,20 @@ int process_scancode(int scancode, char *buffer)
             "cmpl %%eax, %%edx;"
             "je shift_flag_down;" //UBACITI PROVERU DA LI JE CTRL DOWN, ZA CTRL ONLY DOWN
 
+            "movl (ctrl_flag), %%eax;"
+            "cmpl %%eax, %%edx;"
+            "je shift_flag_up_ctrl_flag_down;"
+
+            //NO FLAGS
+            "cld;"
+            "lea (scan_code_first_row), %%esi;"
+            "add %0, %%esi;"
+            "lodsb;"
+            "mov %1, %%edi;"
+            "stosb;"
+            "movl $1, (result_global);"
+            "jmp end;"
+
             "shift_flag_down:"
 
             "movl $1, %%edx;"
@@ -178,13 +193,22 @@ int process_scancode(int scancode, char *buffer)
             "lea (scan_code_second_row), %%esi;"
             "add %0, %%esi;"
             "lodsb;"
-            "lea %1, %%edi;"
+            "mov %1, %%edi;"
             "stosb;"
             "movl $1, (result_global);"
-
+            "jmp end;"
 
             "shift_and_ctrl_down:"
+            "cld;"
+            "movl (mnemonic_size), %%ecx;"
+            "incl %%ecx;"
+            "lea (mnemonic_key), %%esi;"
             ""
+            "loop:"
+            ""
+            "decl %%ecx;"
+
+            "shift_flag_up_ctrl_flag_down:"
 
             //"end_of_file:"//TO BE USED WHEN FILE REACHED 400
 
@@ -198,7 +222,6 @@ int process_scancode(int scancode, char *buffer)
 
 
     buffer[result_global] = '\0';
-    printstr(buffer);
     /*char sc_a[4];
     char sc_b[4];
     char sc_c[4];
