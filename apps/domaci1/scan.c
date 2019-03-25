@@ -18,7 +18,7 @@ static char scan_code_firt_row[SCAN_CODE_SIZE];
 static char scan_code_second_row[SCAN_CODE_SIZE];
 
 static char mnemonic_key[SCAN_CODE_SIZE];
-static char mnemonic[SCAN_CODE_SIZE][SCAN_CODE_SIZE];
+static char mnemonic[SCAN_CODE_SIZE][64];
 
 static volatile int shift_flag;
 static volatile int ctrl_flag;
@@ -80,6 +80,7 @@ int process_scancode(int scancode, char *buffer)
 	int result = 0;
 	int a;
 
+
     __asm__ __volatile__(
             /*"cld;"
             "movl %15, %%eax;"
@@ -87,68 +88,44 @@ int process_scancode(int scancode, char *buffer)
             "cmpl %%eax, %%ebx;"
             "je end_of_file;"*/ //TO BE USED WHEN FILE REACHES 400
 
-            "movl %14, %%edx;" //flag_used
+            //"movl %14, %%edx;" //flag_used
 
             //CTRL/SHIFT/ALT TESTS
 
             "cld;" //shift down compare
-            "pushl %%eax;"
-            "pushl %%edx;"
-            "movl %6, %%eax;"
-            "movl %7, %%edx;"
+            "movl %3, %%eax;"
+            "movl $200, %%edx;"
             "cmpl %%eax, %%edx;"
-            "popl %%edx;"
-            "popl %%eax;"
             "je shift_down;"
 
-            "cld;" //shift up compare
-            "pushl %%eax;"
-            "pushl %%edx;"
-            "movl %6, %%eax;"
-            "movl %8, %%edx;"
+            //shift up compare
+            "movl %3, %%eax;"
+            "movl $300, %%edx;"
             "cmpl %%eax, %%edx;"
-            "popl %%edx;"
-            "popl %%eax;"
             "je shift_up;"
 
-            "cld;" //ctrl down compare
-            "pushl %%eax;"
-            "pushl %%edx;"
-            "movl %6, %%eax;"
-            "movl %9, %%edx;"
+            //ctrl down compare
+            "movl %3, %%eax;"
+            "movl $201, %%edx;"
             "cmpl %%eax, %%edx;"
-            "popl %%edx;"
-            "popl %%eax;"
             "je ctrl_down;"
 
-            "cld;" //ctrl up compare
-            "pushl %%eax;"
-            "pushl %%edx;"
-            "movl %6, %%eax;"
-            "movl %10, %%edx;"
+            //ctrl up compare
+            "movl %3, %%eax;"
+            "movl $301, %%edx;"
             "cmpl %%eax, %%edx;"
-            "popl %%edx;"
-            "popl %%eax;"
             "je ctrl_up;"
 
-            "cld;" //alt down compare
-            "pushl %%eax;"
-            "pushl %%edx;"
-            "movl %6, %%eax;"
-            "movl %11, %%edx;"
+            //alt down compare
+            "movl %3, %%eax;"
+            "movl $202, %%edx;"
             "cmpl %%eax, %%edx;"
-            "popl %%edx;"
-            "popl %%eax;"
             "je alt_down;"
 
-            "cld;" //alt up compare
-            "pushl %%eax;"
-            "pushl %%edx;"
-            "movl %6, %%eax;"
-            "movl %12, %%edx;"
+            //alt up compare
+            "movl %3, %%eax;"
+            "movl $302, %%edx;"
             "cmpl %%eax, %%edx;"
-            "popl %%edx;"
-            "popl %%eax;"
             "je alt_up;"
 
             "jmp no_flags;"
@@ -156,33 +133,28 @@ int process_scancode(int scancode, char *buffer)
             //FLAG_JUMPS
 
             "shift_down:"
-            "movl %13, %%eax;"
-            "movl %13, %%edx;"
+            "movl $1, (shift_flag);"
             "jmp end;"
 
             "shift_up:"
-            "movl %14, %%eax;"
-            "movl %13, %%edx;"
+            "movl $0, (shift_flag);"
+
             "jmp end;"
 
             "ctrl_down:"
-            "movl %13, %%ebx;"
-            "movl %13, %%edx;"
+            "movl $1, (ctrl_flag);"
             "jmp end;"
 
             "ctrl_up:"
-            "movl %14, %%ebx;"
-            "movl %13, %%edx;"
+            "movl $0, (ctrl_flag);"
             "jmp end;"
 
             "alt_down:"
-            "movl %13, %%ecx;"
-            "movl %13, %%edx;"
+            "movl $1, (alt_flag);"
             "jmp end;"
 
             "alt_up:"
-            "movl %14, %%ecx;"
-            "movl %13, %%edx;"
+            "movl $0, (alt_flag);"
             "jmp end;"
 
             "no_flags:"
@@ -190,49 +162,43 @@ int process_scancode(int scancode, char *buffer)
             //"movl $0x0, %%edx;" //Using dx as counter for result
 
             "cld;"
-            "movl %13, %%edx;"
+            "movl $1, %%edx;"
+            "movl (shift_flag), %%eax;"
             "cmpl %%eax, %%edx;"
             "je shift_flag_down;" //UBACITI PROVERU DA LI JE CTRL DOWN, ZA CTRL ONLY DOWN
 
             "shift_flag_down:"
 
-            "movl %13, %%edx;"
+            "movl $1, %%edx;"
             "cmpl %%ebx, %%edx;"
             "je shift_and_ctrl_down;"
 
             //UBACITI UPIS NA BUFFER U ZAVISNOSTI OD IZABRANOG SC-A
             "cld;"
+            "movl $0x0, %%eax;"
             "leal (scan_code_second_row), %%esi;"
-            "pushl %%eax;"
-            //"add (scancode), %%esi;"
+            "add %3, %%esi;"
             "lodsb;"
-            //"leal (buffer), %%edi;"
+            "leal %4, %%edi;"
             "stosb;"
-            ""
+            "movl $1, %5;"
 
 
             "shift_and_ctrl_down:"
             ""
-            //"pushl %%eax;" //Storing shift/ctrl/alt flags
-            //"pushl %%ebx;"
-            //"pushl %%ecx;"
 
             //"end_of_file:"//TO BE USED WHEN FILE REACHED 400
 
             "end:"
 
-            : "=a" (shift_flag), "=b" (ctrl_flag), "=c" (alt_flag)
-            : "a" (shift_flag), "b"(ctrl_flag), "c"(alt_flag), "g" (scancode),
-              "g" (200), "g" (300), "g" (201), "g" (301), "g" (202), "g" (302), "g" (1), "g" (0), "g" (400),
-              "g" (scan_code_firt_row), "g" (scan_code_second_row)
+            :
+            : "a" (shift_flag), "b"(ctrl_flag), "c"(alt_flag), "g" (scancode), "g" (buffer), "g" (result)
             : "%edx", "memory"
             );
 
 
-    char C[5];//USED FOR TESTING
-    itoa(alt_flag, C);
-    write_new_line();
-    printstr(C);
+    buffer[result] = '\0';
+    printstr(buffer);
 
 	return result;
 }
