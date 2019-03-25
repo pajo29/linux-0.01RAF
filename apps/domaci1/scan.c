@@ -20,9 +20,9 @@ static char scan_code_second_row[SCAN_CODE_SIZE];
 static char mnemonic_key[SCAN_CODE_SIZE];
 static char mnemonic[SCAN_CODE_SIZE][64];
 
-static volatile int shift_flag;
-static volatile int ctrl_flag;
-static volatile int alt_flag;
+static int shift_flag;
+static int ctrl_flag;
+static int alt_flag;
 
 
 void check_for_files(int file_TBL, int file_MN);
@@ -93,37 +93,37 @@ int process_scancode(int scancode, char *buffer)
             //CTRL/SHIFT/ALT TESTS
 
             "cld;" //shift down compare
-            "movl %3, %%eax;"
+            "movl %0, %%eax;"
             "movl $200, %%edx;"
             "cmpl %%eax, %%edx;"
             "je shift_down;"
 
             //shift up compare
-            "movl %3, %%eax;"
+            "movl %0, %%eax;"
             "movl $300, %%edx;"
             "cmpl %%eax, %%edx;"
             "je shift_up;"
 
             //ctrl down compare
-            "movl %3, %%eax;"
+            "movl %0, %%eax;"
             "movl $201, %%edx;"
             "cmpl %%eax, %%edx;"
             "je ctrl_down;"
 
             //ctrl up compare
-            "movl %3, %%eax;"
+            "movl %0, %%eax;"
             "movl $301, %%edx;"
             "cmpl %%eax, %%edx;"
             "je ctrl_up;"
 
             //alt down compare
-            "movl %3, %%eax;"
+            "movl %0, %%eax;"
             "movl $202, %%edx;"
             "cmpl %%eax, %%edx;"
             "je alt_down;"
 
             //alt up compare
-            "movl %3, %%eax;"
+            "movl %0, %%eax;"
             "movl $302, %%edx;"
             "cmpl %%eax, %%edx;"
             "je alt_up;"
@@ -175,12 +175,12 @@ int process_scancode(int scancode, char *buffer)
 
             //UBACITI UPIS NA BUFFER U ZAVISNOSTI OD IZABRANOG SC-A
             "cld;"
-            "leal (scan_code_second_row), %%esi;"
-            "add %3, %%esi;"
+            "lea (scan_code_second_row), %%esi;"
+            //"add %3, %%esi;"
             "lodsb;"
-            "leal %4, %%edi;"
+            "lea %1, %%edi;"
             "stosb;"
-            "movl $1, %5;"
+            "movl $1, %2;"
 
 
             "shift_and_ctrl_down:"
@@ -191,13 +191,27 @@ int process_scancode(int scancode, char *buffer)
             "end:"
 
             :
-            : "a" (shift_flag), "b"(ctrl_flag), "c"(alt_flag), "g" (scancode), "g" (buffer), "g" (result)
+            : "g" (scancode), "g" (buffer), "g" (result)
             : "%edx", "%esi", "%edi", "memory"
             );
 
 
-    buffer[result] = '\0';
+    buffer[1] = '\0';
     printstr(buffer);
+    /*char sc_a[4];
+    char sc_b[4];
+    char sc_c[4];
+
+    itoa(shift_flag, sc_a);
+    itoa(ctrl_flag, sc_b);
+    itoa(alt_flag, sc_c);
+
+    write_new_line();
+    printstr(sc_a);
+    printstr(" | ");
+    printstr(sc_b);
+    printstr(" | ");
+    printstr(sc_c);*/
 
 	return result;
 }
