@@ -22,15 +22,15 @@ int main(int argc, char *argv[])
 
     printstr("Unesite naziv fajla sa tabelom scan kodova: ");
 
-    //read(0, buff_TBL, BUFFER_SIZE);
+    read(0, buff_TBL, BUFFER_SIZE);
     strcpy(buff_TBL, "scancodes.tbl\n");
 
     println();
 
     printstr("Unesite naziv fajla sa mnemonicima: ");
 
-    //read(0, buff_MN, BUFFER_SIZE);
-    strcpy(buff_MN, "ctrl.map\n");
+    read(0, buff_MN, BUFFER_SIZE);
+    //strcpy(buff_MN, "ctrl.map\n");
 
     buff_TBL[strlen(buff_TBL) - 1] = '\0'; //Skracivanje '\n' sa kraja, jer read hvata i enter.
     buff_MN[strlen(buff_MN) - 1] = '\0';
@@ -39,17 +39,24 @@ int main(int argc, char *argv[])
     //SCAN DATOTEKA
     char sc_file[BUFFER_SIZE];
 
-    //printstr("\nUnesite naziv sc datoteke: ");
-    //read(0, sc_file, BUFFER_SIZE);
-    //sc_file[strlen(sc_file) - 1] = '\0';
-    strcpy(sc_file, "test1.tst");
+    while(1)
+    {
+    printstr("\nUnesite naziv sc datoteke: ");
+    read(0, sc_file, BUFFER_SIZE);
+    sc_file[strlen(sc_file) - 1] = '\0';
+
+    if((strcmp(sc_file, "exit")) == 0)
+    {
+        _exit(0);
+    }
+    //strcpy(sc_file, "test1.tst");
 
     int file = open(sc_file, O_RDONLY);
 
     if(file == -1)
     {
         printstr("\nFile not found. Exiting.");
-        _exit(1);
+        continue;
     }
 
     char code[4];
@@ -66,6 +73,8 @@ int main(int argc, char *argv[])
     }
 
     close(file);
+
+    }
 
 
     _exit(0);

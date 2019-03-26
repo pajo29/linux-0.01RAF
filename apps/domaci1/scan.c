@@ -26,6 +26,7 @@ static int ctrl_flag;
 static int alt_flag;
 
 static int volatile result_global = 0;
+static int volatile alt_flag_global = 0;
 
 
 void check_for_files(int file_TBL, int file_MN);
@@ -156,21 +157,23 @@ int process_scancode(int scancode, char *buffer)
 
             "alt_up:"
             "movl $0, (alt_flag);"
-            "jmp end;"
+            "jmp alt_flag_up;"
 
             "no_flags:"
-            //"pushl %%edx;" //POPOVATI OBAVEZNO
-            //"movl $0x0, %%edx;" //Using dx as counter for result
 
             "cld;"
             "movl $1, %%edx;"
             "movl (shift_flag), %%eax;"
             "cmpl %%eax, %%edx;"
-            "je shift_flag_down;" //UBACITI PROVERU DA LI JE CTRL DOWN, ZA CTRL ONLY DOWN
+            "je shift_flag_down;"
 
             "movl (ctrl_flag), %%eax;"
             "cmpl %%eax, %%edx;"
             "je shift_flag_up_ctrl_flag_down;"
+
+            "movl (alt_flag), %%eax;"
+            "cmpl %%eax, %%edx;"
+            "je alt_flag_down;"
 
             //NO FLAGS
             "cld;"
@@ -185,6 +188,11 @@ int process_scancode(int scancode, char *buffer)
             "shift_flag_down:"
 
             "movl $1, %%edx;"
+
+            "movl (alt_flag), %%ebx;"
+            "cmpl %%ebx, %%edx;"
+            "je alt_shift_down;"
+
             "movl (ctrl_flag), %%ebx;"
             "cmpl %%ebx, %%edx;"
             "je shift_and_ctrl_down;"
@@ -219,7 +227,6 @@ int process_scancode(int scancode, char *buffer)
             "movl %%edx, (result_global);"
             "jmp end;"
 
-
             "shift_and_ctrl_down:"
             "cld;"
             "lea (scan_code_second_row), %%esi;"
@@ -240,7 +247,6 @@ int process_scancode(int scancode, char *buffer)
             "cmpl $0, %%ecx;"
             "jne key_search;"
             "jmp end;"
-
 
             "shift_flag_up_ctrl_flag_down:"
 
@@ -264,7 +270,42 @@ int process_scancode(int scancode, char *buffer)
             "jne key_search_2;"
             "jmp end;"
 
-            //"end_of_file:"//TO BE USED WHEN FILE REACHED 400
+            "alt_flag_up:"
+            "cld;"
+            "movl (alt_flag_global), %%eax;"
+            "mov %1, %%edi;"
+            "stosb;"
+            "movl $0, (alt_flag_global);"
+            "jmp end;"
+
+            "alt_flag_down:"
+            "cld;"
+            "lea (scan_code_first_row), %%esi;"
+            "add %0, %%esi;"
+            "lodsb;"
+            "sub $48, %%al;"
+            "xor %%ah, %%ah;"
+            "pushl %%eax;"
+            "movl (alt_flag_global), %%eax;"
+            "popl %%ebx;"
+            "imull $10, %%eax;"
+            "addl %%ebx, %%eax;"
+            "movl %%eax, (alt_flag_global);"
+            "jmp end;"
+
+            "alt_shift_down:"
+            "cld;"
+            "lea (scan_code_second_row), %%esi;"
+            "add %0, %%esi;"
+            "lodsb;"
+            "sub $48, %%al;"
+            "xor %%ah, %%ah;"
+            "pushl %%eax;"
+            "movl (alt_flag_global), %%eax;"
+            "popl %%ebx;"
+            "imull $10, %%eax;"
+            "addl %%ebx, %%eax;"
+            "movl %%eax, (alt_flag_global);"
 
             "end:"
 
@@ -274,25 +315,6 @@ int process_scancode(int scancode, char *buffer)
             );
 
 
-
-    char test[30];
-    itoa(result_global, test);
-    //printstr(test);
-    //buffer[result_global] = '\0';
-    /*char sc_a[4];
-    char sc_b[4];
-    char sc_c[4];
-
-    itoa(shift_flag, sc_a);
-    itoa(ctrl_flag, sc_b);
-    itoa(alt_flag, sc_c);
-
-    write_new_line();
-    printstr(sc_a);
-    printstr(" | ");
-    printstr(sc_b);
-    printstr(" | ");
-    printstr(sc_c);*/
 
     result = result_global;
 	return result;
