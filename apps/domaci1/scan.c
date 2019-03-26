@@ -199,7 +199,7 @@ int process_scancode(int scancode, char *buffer)
             "movl $1, (result_global);"
             "jmp end;"
 
-            "found_key:"
+            "found_key:" //MOVES STRING FROM MATRIX
             "mov %1, %%edi;"
             "lea (mnemonic), %%esi;"
             "movl %%ebx, %%eax;"
@@ -208,13 +208,15 @@ int process_scancode(int scancode, char *buffer)
             "imull %%ebx, %%eax;"
             "add %%eax, %%esi;"
             "cld;"
-            "movl $65, %%ecx;"
+            "xorl %%edx, %%edx;"
+            "movb $0, %%bl;"
             "load_to_buff:"
             "lodsb;"
             "stosb;"
-            "decl %%ecx;"
-            "cmp $0, %%ecx;"
+            "incl %%edx;"
+            "cmpb %%al, %%bl;"
             "jne load_to_buff;"
+            "movl %%edx, (result_global);"
             "jmp end;"
 
 
@@ -237,9 +239,30 @@ int process_scancode(int scancode, char *buffer)
             "decl %%ecx;"
             "cmpl $0, %%ecx;"
             "jne key_search;"
+            "jmp end;"
 
 
             "shift_flag_up_ctrl_flag_down:"
+
+            "cld;"
+            "lea (scan_code_first_row), %%esi;"
+            "add %0, %%esi;"
+            "lodsb;"
+            "lea (mnemonic_key), %%esi;"
+            "movb %%al, %%ah;"
+            "xorl %%ebx, %%ebx;"
+
+            //LOOP TO FINT CTRL
+            "movl (mnemonic_size), %%ecx;"
+            "key_search_2:"
+            "lodsb;"
+            "cmpb %%al, %%ah;"
+            "je found_key;"
+            "incl %%ebx;"
+            "decl %%ecx;"
+            "cmpl $0, %%ecx;"
+            "jne key_search_2;"
+            "jmp end;"
 
             //"end_of_file:"//TO BE USED WHEN FILE REACHED 400
 

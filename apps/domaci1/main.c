@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
         fgets(code, 4, file);
         process_scancode(atoi(code), out_buffer); //ISPIS BUFFERA SVAKI PUT
         printstr(out_buffer);
-        printstr(" ");
+        //printstr(" ");
         empty_buff(out_buffer);
 
     }
