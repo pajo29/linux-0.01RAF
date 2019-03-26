@@ -185,6 +185,7 @@ int process_scancode(int scancode, char *buffer)
             "shift_flag_down:"
 
             "movl $1, %%edx;"
+            "movl (ctrl_flag), %%ebx;"
             "cmpl %%ebx, %%edx;"
             "je shift_and_ctrl_down;"
 
@@ -199,18 +200,43 @@ int process_scancode(int scancode, char *buffer)
             "jmp end;"
 
             "found_key:"
+            "mov %1, %%edi;"
+            "lea (mnemonic), %%esi;"
+            "movl %%ebx, %%eax;"
+            "xorl %%edx, %%edx;"
+            "movl $64, %%ebx;"
+            "imull %%ebx, %%eax;"
+            "add %%eax, %%esi;"
+            "cld;"
+            "movl $65, %%ecx;"
+            "load_to_buff:"
+            "lodsb;"
+            "stosb;"
+            "decl %%ecx;"
+            "cmp $0, %%ecx;"
+            "jne load_to_buff;"
+            "jmp end;"
 
 
             "shift_and_ctrl_down:"
             "cld;"
-            "movl $0, %%ecx;"
-            //"incl %%ecx;"
+            "lea (scan_code_second_row), %%esi;"
+            "add %0, %%esi;"
+            "lodsb;"
             "lea (mnemonic_key), %%esi;"
-            "lea (scan_code_second_row), %%edi;"
-            "add %0, %%edi;"
+            "movb %%al, %%ah;"
             "xorl %%ebx, %%ebx;"
 
             //LOOP TO FINT CTRL
+            "movl (mnemonic_size), %%ecx;"
+            "key_search:"
+            "lodsb;"
+            "cmpb %%al, %%ah;"
+            "je found_key;"
+            "incl %%ebx;"
+            "decl %%ecx;"
+            "cmpl $0, %%ecx;"
+            "jne key_search;"
 
 
             "shift_flag_up_ctrl_flag_down:"
@@ -228,7 +254,7 @@ int process_scancode(int scancode, char *buffer)
 
     char test[30];
     itoa(result_global, test);
-    printstr(test);
+    //printstr(test);
     //buffer[result_global] = '\0';
     /*char sc_a[4];
     char sc_b[4];
