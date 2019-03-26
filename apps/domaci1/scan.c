@@ -276,6 +276,7 @@ int process_scancode(int scancode, char *buffer)
             "mov %1, %%edi;"
             "stosb;"
             "movl $0, (alt_flag_global);"
+            "movl $1, (result_global;)"
             "jmp end;"
 
             "alt_flag_down:"
