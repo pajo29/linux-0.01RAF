@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     //printstr("\nUnesite naziv sc datoteke: ");
     //read(0, sc_file, BUFFER_SIZE);
     //sc_file[strlen(sc_file) - 1] = '\0';
-    strcpy(sc_file, "test1.tst");
+    strcpy(sc_file, "testfajl1.tst");
 
     int file = open(sc_file, O_RDONLY);
 
