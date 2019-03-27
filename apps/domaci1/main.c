@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     printstr("Unesite naziv fajla sa tabelom scan kodova: ");
 
     read(0, buff_TBL, BUFFER_SIZE);
-    strcpy(buff_TBL, "scancodes.tbl\n");
+    //strcpy(buff_TBL, "scancodes.tbl\n");
 
     println();
 
