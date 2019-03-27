@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     if(file == -1)
     {
-        printstr("\nFile not found. Exiting.");
+        printstr("\nFile not found.");
         continue;
     }
 
