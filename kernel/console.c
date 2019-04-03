@@ -19,6 +19,7 @@
 #include <linux/tty.h>
 #include <asm/io.h>
 #include <asm/system.h>
+#include <string.h>
 
 #define SCREEN_START 0xb8000
 #define SCREEN_END   0xc0000
@@ -42,6 +43,7 @@ static unsigned long lines=LINES,columns=COLUMNS;
 static unsigned long state=0;
 static unsigned long npar,par[NPAR];
 static unsigned long ques=0;
+static volatile unsigned char special = 0x03;
 static unsigned char attr=0x07;
 
 static volatile unsigned char regular = 0x07;
@@ -654,6 +656,25 @@ void tool_draw(void)
 			:: "a" (c), "m" (*(short *)pos)
 			);
 		}
+	}
+	restore_cur();
+}
+
+void print_name_and_index(void)
+{
+	char name[30];
+	strcpy(name, "Pavle Prica RN 75/2018");
+	int i;
+	save_cur();
+	for(i = 0; i < 22; i++)
+	{
+		gotoxy(i, 0);
+		__asm__(
+			"movb special, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (name[i]), "m" (*(short *)pos)
+			);
+		
 	}
 	restore_cur();
 }

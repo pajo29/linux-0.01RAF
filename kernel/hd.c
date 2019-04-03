@@ -144,7 +144,7 @@ int sys_setup(void)
 			hd[i+5*drive].nr_sects = p->nr_sects;
 		}
 	}
-	printk("Partition table%s ok.\n\r",(NR_HD>1)?"s":"");
+	printk("Pavle Prica RN 75/2018\nPartition table%s ok.\n\r",(NR_HD>1)?"s":"");
 	mount_root();
 	return (0);
 }

@@ -324,7 +324,7 @@ f1_pressed:
 call f1_down
 ret
 
-f1_released
+f1_released:
 call f1_up
 ret
 
