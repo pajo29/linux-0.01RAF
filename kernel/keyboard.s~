@@ -332,6 +332,14 @@ f2_pressed:
 call tool_draw
 ret
 
+index:
+call print_name_and_index
+ret
+
+test:
+call getdents
+ret
+
 key_table:
 	.long none,do_self,do_self,do_self	/* 00-03 s0 esc 1 2 */
 	.long do_self,do_self,do_self,do_self	/* 04-07 3 4 5 6 */
@@ -348,7 +356,7 @@ key_table:
 	.long do_self,do_self,do_self,do_self	/* 30-33 b n m , */
 	.long do_self,minus,rshift,do_self	/* 34-37 . - rshift * */
 	.long alt,do_self,caps,f1_pressed		/* 38-3B alt sp caps f1 */
-	.long f2_pressed,func,func,func		/* 3C-3F f2 f3 f4 f5 */
+	.long f2_pressed,index,func,test		/* 3C-3F f2 f3 f4 f5 */
 	.long func,func,func,func		/* 40-43 f6 f7 f8 f9 */
 	.long func,num,scroll,cursor		/* 44-47 f10 num scr home */
 	.long cursor,cursor,do_self,cursor	/* 48-4B up pgup - left */
