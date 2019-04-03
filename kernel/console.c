@@ -26,6 +26,11 @@
 #define COLUMNS 80
 #define NPAR 16
 
+#define TOOL_COL_START 57
+#define TOOL_COL_END 79
+#define TOOL_LINE_START 0
+#define TOOL_LINE_END 12
+
 extern void keyboard_interrupt(void);
 
 static unsigned long origin=SCREEN_START;
@@ -38,6 +43,11 @@ static unsigned long state=0;
 static unsigned long npar,par[NPAR];
 static unsigned long ques=0;
 static unsigned char attr=0x07;
+
+static volatile unsigned char regular = 0x07;
+static volatile unsigned char dir = 0x03;
+static volatile unsigned char exe_files = 0x02;
+static volatile unsigned char dev = 0x06;
 
 /*
  * this is what the terminal answers to a ESC-Z or csi0c
@@ -384,10 +394,69 @@ static void restore_cur(void)
 	pos=origin+((y*columns+x)<<1);
 }
 
+void tool_draw(void)
+{
+	save_cur();
+	
+	char c = '#';
+	int i, j;
+	for(i = TOOL_COL_START; i < TOOL_COL_END - 1; i++) //UP COLUMN DRAW
+	{
+		gotoxy(i, 0);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+	}
+	for(i = TOOL_COL_START; i < TOOL_COL_END - 1; i++) //DOWN COLUMN DRAW
+	{
+		gotoxy(i, TOOL_LINE_END - 1);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+	}
+	for(i = TOOL_LINE_START; i < TOOL_LINE_END; i++) //LEFT LINE DRAW
+	{
+		gotoxy(TOOL_COL_START, i);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+	}
+	for(i = TOOL_LINE_START; i < TOOL_LINE_END; i++) //RIGH LINE DRAW
+	{
+		gotoxy(TOOL_COL_END - 1, i);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+	}
+	c = ' ';
+	for(i = TOOL_LINE_START + 1; i < TOOL_LINE_END - 1; i++)
+	{
+		for(j = TOOL_COL_START + 1; j < TOOL_COL_END - 1; j++)
+		{
+		gotoxy(j, i);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+		}
+	}
+	restore_cur();
+}
+
 void con_write(struct tty_struct * tty)
 {
 	int nr;
 	char c;
+	
 
 	nr = CHARS(tty->write_q);
 	while (nr--) {
@@ -400,10 +469,25 @@ void con_write(struct tty_struct * tty)
 						pos -= columns<<1;
 						lf();
 					}
+					
+					if(c == '$')
+					{
+					char oldC = c;
+					c = '~';
+					__asm__(
+						"movb green_atr, %%ah\n\t"
+						"movw %%ax, %1\n\t"
+						:: "a" (c), "m" (*(short *)pos)
+						);
+					c = oldC;
+					}
+					else
+					{
 					__asm__("movb attr,%%ah\n\t"
 						"movw %%ax,%1\n\t"
 						::"a" (c),"m" (*(short *)pos)
 						/*:"ax"*/);
+					}
 					pos += 2;
 					x++;
 				} else if (c==27)
