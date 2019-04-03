@@ -47,13 +47,17 @@ static unsigned char attr=0x07;
 static volatile unsigned char regular = 0x07;
 static volatile unsigned char dir = 0x03;
 static volatile unsigned char exe_files = 0x02;
-static volatile unsigned char dev = 0x02;
+static volatile unsigned char dev = 0x06;
+
+static volatile int f1_down_flag = 0;
 
 /*
  * this is what the terminal answers to a ESC-Z or csi0c
  * query (= vt100 response).
  */
 #define RESPONSE "\033[?1;2c"
+
+
 
 static inline void gotoxy(unsigned int new_x,unsigned int new_y)
 {
@@ -394,63 +398,7 @@ static void restore_cur(void)
 	pos=origin+((y*columns+x)<<1);
 }
 
-void tool_draw(void)
-{
-	save_cur();
-	
-	char c = '#';
-	int i, j;
-	for(i = TOOL_COL_START; i < TOOL_COL_END - 1; i++) //UP COLUMN DRAW
-	{
-		gotoxy(i, 0);
-		__asm__(
-			"movb attr, %%ah\n\t"
-			"movw %%ax, %1\n\t"
-			:: "a" (c), "m" (*(short *)pos)
-			);
-	}
-	for(i = TOOL_COL_START; i < TOOL_COL_END - 1; i++) //DOWN COLUMN DRAW
-	{
-		gotoxy(i, TOOL_LINE_END - 1);
-		__asm__(
-			"movb attr, %%ah\n\t"
-			"movw %%ax, %1\n\t"
-			:: "a" (c), "m" (*(short *)pos)
-			);
-	}
-	for(i = TOOL_LINE_START; i < TOOL_LINE_END; i++) //LEFT LINE DRAW
-	{
-		gotoxy(TOOL_COL_START, i);
-		__asm__(
-			"movb attr, %%ah\n\t"
-			"movw %%ax, %1\n\t"
-			:: "a" (c), "m" (*(short *)pos)
-			);
-	}
-	for(i = TOOL_LINE_START; i < TOOL_LINE_END; i++) //RIGH LINE DRAW
-	{
-		gotoxy(TOOL_COL_END - 1, i);
-		__asm__(
-			"movb attr, %%ah\n\t"
-			"movw %%ax, %1\n\t"
-			:: "a" (c), "m" (*(short *)pos)
-			);
-	}
-	c = ' ';
-	for(i = TOOL_LINE_START + 1; i < TOOL_LINE_END - 1; i++)
-	{
-		for(j = TOOL_COL_START + 1; j < TOOL_COL_END - 1; j++)
-		{
-		gotoxy(j, i);
-		__asm__(
-			"movb attr, %%ah\n\t"
-			"movw %%ax, %1\n\t"
-			:: "a" (c), "m" (*(short *)pos)
-			);
-		}
-	}
-	restore_cur();
-}
+
 
 void con_write(struct tty_struct * tty)
 {
@@ -470,12 +418,12 @@ void con_write(struct tty_struct * tty)
 						lf();
 					}
 					
-					if(c == '$')
+					if(c == '#')
 					{
 					char oldC = c;
-					c = '~';
+					c = '$';
 					__asm__(
-						"movb green_atr, %%ah\n\t"
+						"movb attr, %%ah\n\t"
 						"movw %%ax, %1\n\t"
 						:: "a" (c), "m" (*(short *)pos)
 						);
@@ -646,4 +594,90 @@ void con_init(void)
 	a=inb_p(0x61);
 	outb_p(a|0x80,0x61);
 	outb(a,0x61);
+}
+
+void f1_down(void)
+{
+	char c = 'D';
+	save_cur();
+	gotoxy(0, 0);
+	__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+	restore_cur();	
+	f1_down_flag = 1;
+}
+
+void f1_up(void)
+{
+	char c = 'U';
+	save_cur();
+	gotoxy(0, 1);
+	__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+	restore_cur();	
+	f1_down_flag = 0;
+}
+
+void tool_draw(void)
+{
+	save_cur();
+	
+	char c = '#';
+	int i, j;
+	for(i = TOOL_COL_START; i < TOOL_COL_END - 1; i++) //UP COLUMN DRAW
+	{
+		gotoxy(i, 0);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+	}
+	for(i = TOOL_COL_START; i < TOOL_COL_END - 1; i++) //DOWN COLUMN DRAW
+	{
+		gotoxy(i, TOOL_LINE_END - 1);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+	}
+	for(i = TOOL_LINE_START; i < TOOL_LINE_END; i++) //LEFT LINE DRAW
+	{
+		gotoxy(TOOL_COL_START, i);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+	}
+	for(i = TOOL_LINE_START; i < TOOL_LINE_END; i++) //RIGH LINE DRAW
+	{
+		gotoxy(TOOL_COL_END - 1, i);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+	}
+	c = ' ';
+	for(i = TOOL_LINE_START + 1; i < TOOL_LINE_END - 1; i++)
+	{
+		for(j = TOOL_COL_START + 1; j < TOOL_COL_END - 1; j++)
+		{
+		gotoxy(j, i);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+		}
+	}
+	restore_cur();
 }

@@ -320,6 +320,14 @@ minus:	cmpb $1,e0
  * gotten. Most routines just call do_self, or none, depending if
  * they are make or break.
  */
+f1_pressed:
+call f1_down
+ret
+
+f1_released:
+call f1_up
+ret
+
 f2_pressed:
 call tool_draw
 ret
@@ -339,7 +347,7 @@ key_table:
 	.long do_self,do_self,do_self,do_self	/* 2C-2F z x c v */
 	.long do_self,do_self,do_self,do_self	/* 30-33 b n m , */
 	.long do_self,minus,rshift,do_self	/* 34-37 . - rshift * */
-	.long alt,do_self,caps,func		/* 38-3B alt sp caps f1 */
+	.long alt,do_self,caps,f1_pressed		/* 38-3B alt sp caps f1 */
 	.long f2_pressed,func,func,func		/* 3C-3F f2 f3 f4 f5 */
 	.long func,func,func,func		/* 40-43 f6 f7 f8 f9 */
 	.long func,num,scroll,cursor		/* 44-47 f10 num scr home */
@@ -371,7 +379,7 @@ key_table:
 	.long none,none,none,none		/* AC-AF br br br br */
 	.long none,none,none,none		/* B0-B3 br br br br */
 	.long none,none,unrshift,none		/* B4-B7 br br unrshift br */
-	.long unalt,none,uncaps,none		/* B8-BB unalt br uncaps br */
+	.long unalt,none,uncaps,f1_released		/* B8-BB unalt br uncaps br */
 	.long none,none,none,none		/* BC-BF br br br br */
 	.long none,none,none,none		/* C0-C3 br br br br */
 	.long none,none,none,none		/* C4-C7 br br br br */
