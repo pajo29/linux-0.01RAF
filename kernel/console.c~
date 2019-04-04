@@ -56,6 +56,8 @@ static volatile unsigned char dir = 0x03;
 static volatile unsigned char exe_files = 0x02;
 static volatile unsigned char dev = 0x06;
 
+static volatile int tool = 0; //0 for off, 1 for dir, 2 for clipboard
+
 static volatile int f1_down_flag = 0;
 
 /*
@@ -665,12 +667,45 @@ void tool_draw(void)
 	restore_cur();
 }
 
+
+
+static volatile struct m_inode *dir_inode;
+static volatile struct m_inode *root_inode;
+
+static volatile char current_addres[20];
+
+void tool_start(void)
+{
+	if(tool == 0)
+		{
+		tool = 1;
+		root_inode = iget(0x301, 1);
+		current->root = root_inode;
+		current->pwd = root_inode;
+		dir_inode = namei("/");
+		strcpy(current_addres, ".");
+		tool_dir();
+		}
+}
+
+static int selected_index = 0;
+
+void tool_dir()
+{
+	struct dir_entry *entry;
+	struct buffer_head *bh = bread(dir_inode->i_dev, dir_inode->i_zone[0]);
+	entry = (struct dir_entry *) bh->b_data;
+
+	
+
+}
+
 void getDirectoriums(void)
 {
 	struct m_inode *dir_inode;
 	struct m_inode *root_inode;
 	short* my_vmem_pos;
-	char* file_name = "/root";
+	char* file_name = "/";
 
 	root_inode = iget(0x301, 1);
 	current->root = root_inode;
