@@ -337,7 +337,7 @@ call print_name_and_index
 ret
 
 test:
-call getdents_test
+call getDirectoriums
 ret
 
 key_table:

@@ -19,10 +19,12 @@
 #include <linux/tty.h>
 #include <asm/io.h>
 #include <asm/system.h>
+
 #include <string.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <fcntl.h>
+
 
 #define SCREEN_START 0xb8000
 #define SCREEN_END   0xc0000
@@ -663,43 +665,55 @@ void tool_draw(void)
 	restore_cur();
 }
 
-void getdents_test(void)
+void getDirectoriums(void)
 {
-	struct dirent entry; //struktura sa kojom radi getdents funkcija
-	int current_dir_fd;
-	int len;
+	struct m_inode *dir_inode;
+	struct m_inode *root_inode;
+	short* my_vmem_pos;
+	char* file_name = "/dev";
 
-	//otvaramo trenutni direktorijum za citanje
-	current_dir_fd = open(".", O_RDONLY);
+	root_inode = iget(0x301, 1);
+	current->root = root_inode;
+	current->pwd = root_inode;
 
-	while (1)
+	dir_inode = namei(file_name);
+
+	struct dir_entry *entry;
+	
+	struct buffer_head *bh = bread(dir_inode->i_dev, dir_inode->i_zone[0]);
+	
+	entry = (struct dir_entry*) bh->b_data;
+	
+	//entry++;
+
+	//entry->inode == 0
+
+	while(1)
 	{
-		//prvi argument je otvoreni fd za dir koji citamo
 
-		//drugi argument je struktura koja ce sadrzati rezultat
+	if(entry->inode == 0)
+		break;
 
-		//treci argument bi trebalo da bude koliko stavki citamo,
-		//ali u Linux 0.0.1 se uvek cita jedna stavka i ovaj argument se ignorise
+	struct m_inode *node;
+	node = iget(0x301, entry->inode);
 
-		//ako hocemo da procitamo sve stavke u direktorijumu,
-		//moramo da pozovemo getdents vise puta nad istim fd
+	printk("%d ", node->i_mode);
+	printk(entry->name);
+	printk("\n");
 
-		//povratna vrednost je duzina imena stavke ili 0 ako smo dosli do kraja
-		len = getdents(current_dir_fd, &entry, 1);
+	
 
-		if (len > 0)
-		{
-			write(1, entry.d_name, len);
-			write(1, "\n", 1);
-		}
-		else
-		{
-			break;
-		}
-		
-	}
+	iput(node);
 
-	close(current_dir_fd);
+	entry++;
+
+	}	
+
+	iput(root_inode);
+	iput(dir_inode);
+	
+	current->root = NULL;
+	current->pwd = NULL;
 }
 
 void print_name_and_index(void)

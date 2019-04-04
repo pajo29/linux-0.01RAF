@@ -337,7 +337,7 @@ call print_name_and_index
 ret
 
 test:
-call getdents
+call testt
 ret
 
 key_table:
