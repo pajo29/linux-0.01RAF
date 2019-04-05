@@ -674,6 +674,8 @@ void tool_draw(void)
 static volatile struct m_inode *dir_inode;
 static volatile struct m_inode *root_inode;
 
+static volatile struct file_for_list *file_list;
+
 static volatile char current_addres[20];
 
 void tool_start(void)
@@ -684,8 +686,8 @@ void tool_start(void)
 		root_inode = iget(0x301, 1);
 		current->root = root_inode;
 		current->pwd = root_inode;
-		dir_inode = namei("/root");
 		strcpy(current_addres, "/");
+		dir_inode = namei(current_addres);
 		tool_dir();
 		iput(root_inode);
 		iput(dir_inode);
@@ -701,6 +703,50 @@ void tool_dir()
 	entry = (struct dir_entry *) bh->b_data;
 
 	set_path_name(current_addres);
+
+	fill_list();
+
+}
+
+void fill_list() //16877 dir, 33188 reg file, 33261 exe, 8685 dev
+{
+	struct dir_entry *entry;
+	struct buffer_head *bh = bread(dir_inode->i_dev, dir_inode->i_zone[0]);
+	entry = (struct dir_entry*) bh->b_data;
+
+	int i = 0;
+
+	while(1)
+	{
+		if(entry->inode == 0)
+			break;
+			
+		struct m_inode *node;
+		node = iget(0x301, entry->inode);
+
+		int type = 0;
+		switch(node->i_mode)
+		{
+			case 16877:
+				type = 1; break;
+			case 33188:
+				type = 0: break;
+			case 33261:
+				type = 2: break;
+			case 8685:
+				type = 3: break;
+
+		}
+		(file_list+i)->type = type;
+		(file_list+i)->inode = entry->inode;
+		strcpy((file_list+i)->name, entry->name);
+	
+		iput(node);
+		entry++;
+		i++;
+	}
+	
+	(file_list+i)->type = -1;
 
 }
 
@@ -751,7 +797,7 @@ void getDirectoriums(void)
 	struct m_inode *dir_inode;
 	struct m_inode *root_inode;
 	short* my_vmem_pos;
-	char* file_name = "/";
+	char* file_name = "/dev";
 
 	root_inode = iget(0x301, 1);
 	current->root = root_inode;
