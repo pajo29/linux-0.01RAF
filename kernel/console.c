@@ -665,6 +665,8 @@ void tool_draw(void)
 		}
 	}
 	restore_cur();
+
+	tool_start();
 }
 
 
@@ -685,6 +687,8 @@ void tool_start(void)
 		dir_inode = namei("/");
 		strcpy(current_addres, "/");
 		tool_dir();
+		iput(root_inode);
+		iput(dir_inode);
 		}
 }
 
@@ -696,8 +700,50 @@ void tool_dir()
 	struct buffer_head *bh = bread(dir_inode->i_dev, dir_inode->i_zone[0]);
 	entry = (struct dir_entry *) bh->b_data;
 
-	
+	set_path_name(current_addres);
 
+}
+
+void set_path_name(char const *pathname)
+{
+	int k = strlen(pathname);
+	k /= 2;
+	int col_write_start = TOOL_COL_START + (12 - k);
+	save_cur();
+
+	char c = '[';
+	gotoxy(col_write_start-1, 0);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+
+	int n = strlen(pathname);
+	int i;
+	for(i = 0; i < n; i++)
+	{
+		
+	gotoxy(col_write_start + i, 0);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (pathname[i]), "m" (*(short *)pos)
+			);
+	}
+
+	c = ']';
+	gotoxy(col_write_start + i, 0);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+		
+
+	
+	restore_cur();
+	
 }
 
 void getDirectoriums(void)

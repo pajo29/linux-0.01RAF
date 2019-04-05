@@ -330,6 +330,7 @@ ret
 
 f2_pressed:
 call tool_draw
+call tool_start
 ret
 
 index:
@@ -337,7 +338,7 @@ call print_name_and_index
 ret
 
 test:
-call testt
+call getDirectoriums
 ret
 
 key_table:
