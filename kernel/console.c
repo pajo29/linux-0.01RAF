@@ -692,7 +692,7 @@ void tool_start(void)
 		root_inode = iget(0x301, 1);
 		current->root = root_inode;
 		current->pwd = root_inode;
-		strcpy(current_addres, "/root");
+		strcpy(current_addres, "/");
 		dir_inode = namei(current_addres);
 		tool_dir();
 		iput(root_inode);
@@ -761,7 +761,18 @@ void draw_list()
 
 void mark_selected()
 {
-	
+	int index = (selected_index + 1) + TOOL_LINE_START;
+
+	int j = TOOL_COL_START + 1;
+
+
+	save_cur();
+	for( ; j < TOOL_COL_END; j++)
+	{
+		
+	}
+
+	restore_cur();
 }
 
 void fill_list() //16877 dir, 33188 reg file, 33261 exe, 8685 dev
@@ -773,10 +784,13 @@ void fill_list() //16877 dir, 33188 reg file, 33261 exe, 8685 dev
 
 
 	int i = 0;
-	while(i < 12)
+	while(i < 10)
 	{
 		if(entry->inode == 0)
 			break;
+
+		if(entry->name[0] != '.')
+		{
 		
 		struct m_inode *node;
 		node = iget(0x301, entry->inode);
@@ -798,11 +812,12 @@ void fill_list() //16877 dir, 33188 reg file, 33261 exe, 8685 dev
 		strcpy(name[i], entry->name);
 
 		iput(node);
-		entry++;
 		i++;
+		}
+		entry++;
 	}
 
-	list_count = (i - 2);
+	list_count = i;
 
 }
 

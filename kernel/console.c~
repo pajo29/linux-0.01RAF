@@ -761,6 +761,8 @@ void draw_list()
 
 void mark_selected()
 {
+	int index = (selected_index + 1) + TOOL_LINE_START;
+
 	
 }
 
@@ -773,10 +775,13 @@ void fill_list() //16877 dir, 33188 reg file, 33261 exe, 8685 dev
 
 
 	int i = 0;
-	while(i < 12)
+	while(i < 10)
 	{
 		if(entry->inode == 0)
 			break;
+
+		if(entry->name[0] != '.')
+		{
 		
 		struct m_inode *node;
 		node = iget(0x301, entry->inode);
@@ -798,11 +803,12 @@ void fill_list() //16877 dir, 33188 reg file, 33261 exe, 8685 dev
 		strcpy(name[i], entry->name);
 
 		iput(node);
-		entry++;
 		i++;
+		}
+		entry++;
 	}
 
-	list_count = (i - 2);
+	list_count = i;
 
 }
 
