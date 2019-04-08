@@ -710,6 +710,7 @@ void tool_dir()
 	fill_list();
 	
 	draw_list();
+	mark_selected();
 
 }
 
@@ -761,9 +762,24 @@ void draw_list()
 
 void mark_selected()
 {
-	int index = (selected_index + 1) + TOOL_LINE_START;
+	int j;
 
-	
+
+	save_cur();
+	for(j = TOOL_COL_START + 1; j < TOOL_COL_END; j++)
+	{
+		char c = ' ';
+		gotoxy(j, selected_index + 1);
+		__asm__(
+			"movb 0x04, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+
+		
+	}
+
+	restore_cur();
 }
 
 void fill_list() //16877 dir, 33188 reg file, 33261 exe, 8685 dev

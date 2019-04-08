@@ -710,6 +710,7 @@ void tool_dir()
 	fill_list();
 	
 	draw_list();
+	mark_selected();
 
 }
 
@@ -761,14 +762,20 @@ void draw_list()
 
 void mark_selected()
 {
-	int index = (selected_index + 1) + TOOL_LINE_START;
-
-	int j = TOOL_COL_START + 1;
+	int j;
 
 
 	save_cur();
-	for( ; j < TOOL_COL_END; j++)
+	for(j = TOOL_COL_START + 1; j < TOOL_COL_END - 1; j++)
 	{
+		char c = ' ';
+		gotoxy(j, selected_index + 1);
+		__asm__(
+			"movb 0x04, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+
 		
 	}
 
