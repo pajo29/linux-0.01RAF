@@ -53,11 +53,6 @@ void buffer_init(void);
 
 typedef char buffer_block[BLOCK_SIZE];
 
-struct file_for_list {
-	int type; //0 reg_file, 1 dir, 2 exe, 3 dev
-	unsigned short inode;
-	char name[NAME_LEN];
-};
 
 struct buffer_head {
 	char * b_data;			/* pointer to data block (1024 bytes) */

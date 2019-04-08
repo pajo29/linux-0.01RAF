@@ -674,7 +674,13 @@ void tool_draw(void)
 static volatile struct m_inode *dir_inode;
 static volatile struct m_inode *root_inode;
 
-static volatile struct file_for_list *file_list;
+static volatile int type[10];
+static volatile unsigned short inode[10];
+static volatile char name[20][10];
+
+static volatile int list_count;
+
+
 
 static volatile char current_addres[20];
 
@@ -686,11 +692,13 @@ void tool_start(void)
 		root_inode = iget(0x301, 1);
 		current->root = root_inode;
 		current->pwd = root_inode;
-		strcpy(current_addres, "/");
+		strcpy(current_addres, "/root");
 		dir_inode = namei(current_addres);
 		tool_dir();
 		iput(root_inode);
 		iput(dir_inode);
+		current->root = NULL;
+		current->pwd = NULL;
 		}
 }
 
@@ -698,98 +706,104 @@ static int selected_index = 0;
 
 void tool_dir()
 {
-	struct dir_entry *entry;
-	struct buffer_head *bh = bread(dir_inode->i_dev, dir_inode->i_zone[0]);
-	entry = (struct dir_entry *) bh->b_data;
-
 	set_path_name(current_addres);
-
 	fill_list();
+	
+	draw_list();
 
+}
+
+
+void draw_list()
+{
+	if(list_count == 0)
+		return;
+	
+	unsigned char col;
+
+	int i;
+	save_cur();
+	for(i = 0; i < list_count; i++)
+	{
+		int j;
+		if(type[i] == 0)
+			col = regular;
+		else if(type[i] == 1)
+			col = dir;
+		else if(type[i] == 2)
+			col = exe_files;
+		else if(type[i] == 3)
+			col = dev;
+
+		int k = strlen(name[i]);
+		k /= 2;
+
+		int col_write_start = TOOL_COL_START + (12 - k);
+		for(j = 0; j < strlen(name[i]); j++)
+		{
+			char c = name[i][j];
+			
+			gotoxy(col_write_start + j, i + 1);
+
+			__asm__(
+			"movb %2, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos), "g" (col)
+			);
+
+		}	
+	}
+
+
+	restore_cur();
+	
+}
+
+void mark_selected()
+{
+	
 }
 
 void fill_list() //16877 dir, 33188 reg file, 33261 exe, 8685 dev
 {
 	struct dir_entry *entry;
 	struct buffer_head *bh = bread(dir_inode->i_dev, dir_inode->i_zone[0]);
+	
 	entry = (struct dir_entry*) bh->b_data;
 
-	int i = 0;
 
-	while(1)
+	int i = 0;
+	while(i < 12)
 	{
 		if(entry->inode == 0)
 			break;
-			
+		
 		struct m_inode *node;
 		node = iget(0x301, entry->inode);
+		
+		
+		int type_f = -1;
 
-		int type = 0;
-		switch(node->i_mode)
-		{
-			case 16877:
-				type = 1; break;
-			case 33188:
-				type = 0; break;
-			case 33261:
-				type = 2; break;
-			case 8685:
-				type = 3; break;
+		if(node->i_mode == 16877)
+			type_f = 1;
+		else if(node->i_mode == 33188)
+			type_f = 0;
+		else if(node->i_mode == 33261)
+			type_f = 2;
+		else if(node->i_mode == 8685)
+			type_f = 3;
 
-		}
-		(file_list+i)->type = type;
-		(file_list+i)->inode = entry->inode;
-		strcpy((file_list+i)->name, entry->name);
-	
+		type[i] = type_f;
+		inode[i] = entry->inode;
+		strcpy(name[i], entry->name);
+
 		iput(node);
 		entry++;
 		i++;
 	}
-	
-	(file_list+i)->type = -1;
 
-}
+	list_count = (i - 2);
 
-void set_path_name(char const *pathname)
-{
-	int k = strlen(pathname);
-	k /= 2;
-	int col_write_start = TOOL_COL_START + (12 - k);
-	save_cur();
-
-	char c = '[';
-	gotoxy(col_write_start-1, 0);
-		__asm__(
-			"movb attr, %%ah\n\t"
-			"movw %%ax, %1\n\t"
-			:: "a" (c), "m" (*(short *)pos)
-			);
-
-	int n = strlen(pathname);
-	int i;
-	for(i = 0; i < n; i++)
-	{
-		
-	gotoxy(col_write_start + i, 0);
-		__asm__(
-			"movb attr, %%ah\n\t"
-			"movw %%ax, %1\n\t"
-			:: "a" (pathname[i]), "m" (*(short *)pos)
-			);
-	}
-
-	c = ']';
-	gotoxy(col_write_start + i, 0);
-		__asm__(
-			"movb attr, %%ah\n\t"
-			"movw %%ax, %1\n\t"
-			:: "a" (c), "m" (*(short *)pos)
-			);
-		
-
-	
-	restore_cur();
-	
 }
 
 void getDirectoriums(void)
@@ -797,7 +811,7 @@ void getDirectoriums(void)
 	struct m_inode *dir_inode;
 	struct m_inode *root_inode;
 	short* my_vmem_pos;
-	char* file_name = "/dev";
+	char* file_name = "/";
 
 	root_inode = iget(0x301, 1);
 	current->root = root_inode;
@@ -842,6 +856,50 @@ void getDirectoriums(void)
 	current->root = NULL;
 	current->pwd = NULL;
 }
+
+void set_path_name(char const *pathname)
+{
+	int k = strlen(pathname);
+	k /= 2;
+	int col_write_start = TOOL_COL_START + (12 - k);
+	save_cur();
+
+	char c = '[';
+	gotoxy(col_write_start-1, 0);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+
+	int n = strlen(pathname);
+	int i;
+	for(i = 0; i < n; i++)
+	{
+		
+	gotoxy(col_write_start + i, 0);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (pathname[i]), "m" (*(short *)pos)
+			);
+	}
+
+	c = ']';
+	gotoxy(col_write_start + i, 0);
+		__asm__(
+			"movb attr, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos)
+			);
+		
+
+	
+	restore_cur();
+	
+}
+
+
 
 void print_name_and_index(void)
 {
