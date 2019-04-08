@@ -676,7 +676,7 @@ static volatile struct m_inode *root_inode;
 
 static volatile int type[10];
 static volatile unsigned short inode[10];
-static volatile char name[20][10];
+static volatile char name[10][20];
 
 static volatile int list_count;
 
@@ -692,7 +692,7 @@ void tool_start(void)
 		root_inode = iget(0x301, 1);
 		current->root = root_inode;
 		current->pwd = root_inode;
-		strcpy(current_addres, "/");
+		strcpy(current_addres, "/bin");
 		dir_inode = namei(current_addres);
 		tool_dir();
 		iput(root_inode);
@@ -766,14 +766,15 @@ void mark_selected()
 
 
 	save_cur();
-	for(j = TOOL_COL_START + 1; j < TOOL_COL_END; j++)
+	for(j = TOOL_COL_START + 1; j < TOOL_COL_END - 1; j++)
 	{
-		char c = ' ';
+		unsigned char colour = 0x30;
 		gotoxy(j, selected_index + 1);
 		__asm__(
-			"movb 0x04, %%ah\n\t"
-			"movw %%ax, %1\n\t"
-			:: "a" (c), "m" (*(short *)pos)
+			"movw %0, %%ax\n\t"
+			"movb %1, %%ah\n\t"
+			"movw %%ax, %0\n\t"
+			:: "m" (*(short *)pos), "m" (colour) : "%ax"
 			);
 
 		
@@ -863,8 +864,6 @@ void getDirectoriums(void)
 	printk("%d ", node->i_mode);
 	printk(entry->name);
 	printk("\n");
-
-	
 
 	iput(node);
 
