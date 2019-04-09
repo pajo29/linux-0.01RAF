@@ -354,7 +354,7 @@ arr_up_:
 call arr_up
 ret
 
-add_down_:
+arr_down_:
 call arr_down
 ret
 

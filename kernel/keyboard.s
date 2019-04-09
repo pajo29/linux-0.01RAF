@@ -358,12 +358,24 @@ arr_down_:
 call arr_down
 ret
 
+arr_left_:
+call arr_left
+ret
+
+arr_right_:
+call arr_right
+ret
+
 arrow:
 cld
 cmpb $0x48, %al
 je arr_up_
 cmpb $0x50, %al
 je arr_down_
+cmpb $0x4B, %al
+je arr_left_
+cmpb $0x4D, %al
+je arr_right_
 ret
 
 

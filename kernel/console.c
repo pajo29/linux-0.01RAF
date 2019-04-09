@@ -689,17 +689,27 @@ void tool_start(void)
 	if(tool == 0)
 		{
 		tool = 1;
+		strcpy(current_addres, "/");
+		openR();
+		tool_dir();
+		closeR();
+		}
+}
+
+void openR(void)
+{
 		root_inode = iget(0x301, 1);
 		current->root = root_inode;
 		current->pwd = root_inode;
-		strcpy(current_addres, "/");
-		dir_inode = namei(current_addres);
-		tool_dir();
+		dir_inode = namei(current_addres);	
+}
+
+void closeR(void)
+{
 		iput(root_inode);
-		iput(dir_inode);
+		//iput(dir_inode);
 		current->root = NULL;
 		current->pwd = NULL;
-		}
 }
 
 static int selected_index = 0;
@@ -919,6 +929,60 @@ void set_path_name(char const *pathname)
 	
 }
 
+void arr_right(void)
+{
+	if(type[selected_index] != 1)
+	{
+		printk("Not a dir\n");
+		return;
+	}
+	strcat(current_addres, name[selected_index]);
+	strcat(current_addres, "/");
+	openR();
+	tool_draw();
+	set_path_name(current_addres);
+	fill_list();
+	
+	draw_list();
+	if(list_count == 0)
+		return;
+
+	selected_index = 0;
+	mark_selected();
+	closeR();
+	
+}
+
+void arr_left(void)
+{
+	if(strlen(current_addres) == 1)
+		return;
+
+	int i = strlen(current_addres) - 2;
+	while(1)
+	{
+		if(current_addres[i] == '/')
+		{
+			current_addres[++i] = '\0';
+			break;	
+		}
+		i--;
+	}
+	openR();
+	tool_draw();
+	set_path_name(current_addres);
+	fill_list();
+	
+	draw_list();
+	if(list_count == 0)
+		return;
+
+	selected_index = 0;
+	mark_selected();
+	closeR();
+}
+
+
 void arr_down(void)
 {
 	if((selected_index + 1) < list_count) {
@@ -940,11 +1004,6 @@ void arr_up(void)
 		mark_selected();
 	}
 	
-}
-
-void testArr(void)
-{
-	printk("Kako treba 2");
 }
 
 
