@@ -716,7 +716,9 @@ static int selected_index = 0;
 
 void tool_dir()
 {
+	tool_draw();
 	set_path_name(current_addres);
+	
 	fill_list();
 	
 	draw_list();

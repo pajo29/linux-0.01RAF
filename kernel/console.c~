@@ -717,6 +717,7 @@ static int selected_index = 0;
 void tool_dir()
 {
 	set_path_name(current_addres);
+	tool_draw();
 	fill_list();
 	
 	draw_list();
@@ -963,17 +964,8 @@ void arr_left(void)
 	{
 		if(current_addres[i] == '/')
 		{
-				/*char new_addres[40];
-				int j;
-				for(j = 0; j < i; j++)
-				{
-					new_addres[j] = current_addres[j];
-				}
-				new_addres[i++] = '/';
-				new_addres[i] = '\0';
-				strcpy(current_addres, new_addres);*/
 			current_addres[++i] = '\0';
-				break;	
+			break;	
 		}
 		i--;
 	}

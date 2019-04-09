@@ -339,7 +339,7 @@ call f1_up
 ret
 
 f2_pressed:
-call tool_draw
+call tool_start
 ret
 
 index:
