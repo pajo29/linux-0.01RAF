@@ -920,6 +920,17 @@ void set_path_name(char const *pathname)
 	
 }
 
+void arr_up(void)
+{
+
+	printk("Kako treba 1");
+}
+
+void testArr(void)
+{
+	printk("Kako treba 2");
+}
+
 
 
 void print_name_and_index(void)

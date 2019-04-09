@@ -155,6 +155,7 @@ num:	xorb $2,leds
  *  checking for numeric keypad etc.
  */
 cursor:
+	call testArr
 	subb $0x47,%al
 	jb 1f
 	cmpb $12,%al
@@ -320,17 +321,21 @@ minus:	cmpb $1,e0
  * gotten. Most routines just call do_self, or none, depending if
  * they are make or break.
  */
+
+f1 = 0;
+
 f1_pressed:
+f1 = 1;
 call f1_down
 ret
 
 f1_released:
+f1 = 0;
 call f1_up
 ret
 
 f2_pressed:
 call tool_draw
-call tool_start
 ret
 
 index:
@@ -339,6 +344,15 @@ ret
 
 test:
 call getDirectoriums
+ret
+
+arr_up:
+cld
+movl f1, %eax
+movl $0, %ebx
+cmpl %eax, %ebx
+jne cursor
+call arr_up
 ret
 
 key_table:
@@ -360,7 +374,7 @@ key_table:
 	.long f2_pressed,index,func,test		/* 3C-3F f2 f3 f4 f5 */
 	.long func,func,func,func		/* 40-43 f6 f7 f8 f9 */
 	.long func,num,scroll,cursor		/* 44-47 f10 num scr home */
-	.long cursor,cursor,do_self,cursor	/* 48-4B up pgup - left */
+	.long arr_up,cursor,do_self,cursor	/* 48-4B up pgup - left */
 	.long cursor,cursor,do_self,cursor	/* 4C-4F n5 right + end */
 	.long cursor,cursor,cursor,cursor	/* 50-53 dn pgdn ins del */
 	.long none,none,do_self,func		/* 54-57 sysreq ? < f11 */

@@ -692,7 +692,7 @@ void tool_start(void)
 		root_inode = iget(0x301, 1);
 		current->root = root_inode;
 		current->pwd = root_inode;
-		strcpy(current_addres, "/bin");
+		strcpy(current_addres, "/");
 		dir_inode = namei(current_addres);
 		tool_dir();
 		iput(root_inode);
@@ -918,6 +918,12 @@ void set_path_name(char const *pathname)
 	
 	restore_cur();
 	
+}
+
+void arr_up(void)
+{
+
+
 }
 
 
