@@ -154,8 +154,12 @@ num:	xorb $2,leds
  *  curosr-key/numeric keypad cursor keys are handled here.
  *  checking for numeric keypad etc.
  */
+
 cursor:
-	call testArr
+	//call testArr
+	cld
+	cmpb $1, f1
+	je arrow
 	subb $0x47,%al
 	jb 1f
 	cmpb $12,%al
@@ -322,15 +326,15 @@ minus:	cmpb $1,e0
  * they are make or break.
  */
 
-f1 = 0;
+f1: .byte 0
 
 f1_pressed:
-f1 = 1;
+movb $1, f1
 call f1_down
 ret
 
 f1_released:
-f1 = 0;
+movb $0, f1
 call f1_up
 ret
 
@@ -346,14 +350,23 @@ test:
 call getDirectoriums
 ret
 
-arr_up:
-//cld
-//movl f1, %eax
-//movl $0, %ebx
-//cmpl %eax, %ebx
-//jne cursor
+arr_up_:
 call arr_up
 ret
+
+arr_down_:
+call arr_down
+ret
+
+arrow:
+cld
+cmpb $0x48, %al
+je arr_up_
+cmpb $0x50, %al
+je arr_down_
+ret
+
+
 
 key_table:
 	.long none,do_self,do_self,do_self	/* 00-03 s0 esc 1 2 */
@@ -374,7 +387,7 @@ key_table:
 	.long f2_pressed,index,func,test		/* 3C-3F f2 f3 f4 f5 */
 	.long func,func,func,func		/* 40-43 f6 f7 f8 f9 */
 	.long func,num,scroll,cursor		/* 44-47 f10 num scr home */
-	.long arr_up,cursor,do_self,cursor	/* 48-4B up pgup - left */
+	.long cursor,cursor,do_self,cursor	/* 48-4B up pgup - left */
 	.long cursor,cursor,do_self,cursor	/* 4C-4F n5 right + end */
 	.long cursor,cursor,cursor,cursor	/* 50-53 dn pgdn ins del */
 	.long none,none,do_self,func		/* 54-57 sysreq ? < f11 */

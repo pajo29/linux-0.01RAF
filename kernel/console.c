@@ -58,7 +58,7 @@ static volatile unsigned char dev = 0x06;
 
 static volatile int tool = 0; //0 for off, 1 for dir, 2 for clipboard
 
-static volatile int f1_down_flag = 0;
+volatile int f1_down_flag = 0;
 
 /*
  * this is what the terminal answers to a ESC-Z or csi0c
@@ -711,7 +711,6 @@ void tool_dir()
 	
 	draw_list();
 	mark_selected();
-
 }
 
 
@@ -920,10 +919,27 @@ void set_path_name(char const *pathname)
 	
 }
 
+void arr_down(void)
+{
+	if((selected_index + 1) < list_count) {
+		selected_index++;
+		tool_draw();
+		set_path_name(current_addres);
+		draw_list();
+		mark_selected();
+	}
+}
+
 void arr_up(void)
 {
-
-	printk("Kako treba 1");
+	if((selected_index - 1) >= 0) {
+		selected_index--;
+		tool_draw();
+		set_path_name(current_addres);
+		draw_list();
+		mark_selected();
+	}
+	
 }
 
 void testArr(void)
