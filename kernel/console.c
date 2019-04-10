@@ -681,7 +681,7 @@ static int selected_index = 0;
 static volatile int list_count;
 
 //Clipboard
-static volatile text_clip[10][20];
+static volatile char text_clip[10][20];
 static int selected_index_clip = 0;
 
 static volatile int  list_count_clip;

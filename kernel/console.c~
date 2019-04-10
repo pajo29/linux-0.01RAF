@@ -1103,7 +1103,7 @@ void arr_up(void)
 	{
 		if(selected_index_clip - 1 >= 0)
 		{
-		selected_index_clip++;
+		selected_index_clip--;
 		tool_draw();
 		set_path_name("clipboard");
 		draw_list_clip();
