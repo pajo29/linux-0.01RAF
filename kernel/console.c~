@@ -707,7 +707,7 @@ void openR(void)
 void closeR(void)
 {
 		iput(root_inode);
-		//iput(dir_inode);
+		iput(dir_inode);
 		current->root = NULL;
 		current->pwd = NULL;
 }
@@ -716,8 +716,9 @@ static int selected_index = 0;
 
 void tool_dir()
 {
-	set_path_name(current_addres);
 	tool_draw();
+	set_path_name(current_addres);
+	
 	fill_list();
 	
 	draw_list();
@@ -844,7 +845,7 @@ void getDirectoriums(void)
 	struct m_inode *dir_inode;
 	struct m_inode *root_inode;
 	short* my_vmem_pos;
-	char* file_name = "/";
+	char* file_name = "/bin";
 
 	root_inode = iget(0x301, 1);
 	current->root = root_inode;

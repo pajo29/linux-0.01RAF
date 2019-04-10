@@ -707,7 +707,7 @@ void openR(void)
 void closeR(void)
 {
 		iput(root_inode);
-		//iput(dir_inode);
+		iput(dir_inode);
 		current->root = NULL;
 		current->pwd = NULL;
 }
