@@ -681,7 +681,7 @@ static int selected_index = 0;
 static volatile int list_count;
 
 //Clipboard
-static volatile text[10][20];
+static volatile text_clip[10][20];
 static int selected_index_clip = 0;
 
 static volatile int  list_count_clip;
@@ -738,12 +738,13 @@ void tool_clip()
 {
 	tool_draw();
 	set_path_name("clipboard");
-	strcpy(text[0], "Ivana");
-	strcpy(text[1], "Ivana");
-	strcpy(text[2], "Ivana");
+	
+	strcpy(text_clip[0], "RAF");
+	strcpy(text_clip[1], "FAR");
+	strcpy(text_clip[2], "FFR");
 
 	draw_list_clip();
-	mark_selected();
+	mark_selected_clip();
 }
 
 void tool_dir()
@@ -757,7 +758,7 @@ void tool_dir()
 	mark_selected();
 }
 
-void draw_list_clip()
+void draw_list_clip()//BANE
 {
 	unsigned char col = 0x06;
 	int i;
@@ -766,22 +767,22 @@ void draw_list_clip()
 	{
 		//if(strlen(text[i]) == 0)
 		//	continue;
-		int k = strlen(text[i]);
+		int k = strlen(text_clip[i]);
 		k /= 2;
 		//printk(text[i]);
 		//printk("\n");
 		
 		int col_write_start = TOOL_COL_START + (12 - k);
 		int j;
-		for(j = 0; j < strlen(text[i]); j++)
+		for(j = 0; j < strlen(text_clip[i]); j++)
 		{
-			char c = text[i][j];
+			char c = text_clip[i][j];
 			gotoxy(col_write_start + j, i + 1);
 			
 			__asm__(
 			"movb %2, %%ah\n\t"
 			"movw %%ax, %1\n\t"
-			:: "a" (c), "m" (*(short *)pos), "g" (col)
+			:: "a" (c), "m" (*(short *)pos), "m" (col)
 			);
 		}
 	}
