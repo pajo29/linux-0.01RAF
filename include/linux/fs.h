@@ -95,7 +95,7 @@ struct m_inode {
 	unsigned short i_num;
 	unsigned short i_count;
 	unsigned char i_lock;
-	unsigned char i_dirt;
+	unsigned char i_dirt; 
 	unsigned char i_pipe;
 	unsigned char i_mount;
 	unsigned char i_seek;

@@ -666,7 +666,6 @@ void tool_draw(void)
 	}
 	restore_cur();
 
-	tool_start();
 }
 
 
@@ -674,11 +673,18 @@ void tool_draw(void)
 static volatile struct m_inode *dir_inode;
 static volatile struct m_inode *root_inode;
 
-static volatile int type[10];
+//File explorer
+static volatile int type[10]; 
 static volatile unsigned short inode[10];
 static volatile char name[10][20];
-
+static int selected_index = 0;
 static volatile int list_count;
+
+//Clipboard
+static volatile text[10][20];
+static int selected_index_clip = 0;
+
+static volatile int  list_count_clip;
 
 
 
@@ -686,6 +692,21 @@ static volatile char current_addres[20];
 
 void tool_start(void)
 {
+	
+	if(tool == 1)
+		{
+		tool = 2;
+		tool_clip();
+		return;
+		}
+	if(tool == 2)
+		{
+		tool = 1;
+		//openR();
+		tool_dir();
+		//closeR();
+		return;
+		}
 	if(tool == 0)
 		{
 		tool = 1;
@@ -712,7 +733,19 @@ void closeR(void)
 		current->pwd = NULL;
 }
 
-static int selected_index = 0;
+
+void tool_clip()
+{
+	tool_draw();
+	set_path_name("clipboard");
+	strcpy(text[0], "Ivana");
+	strcpy(text[1], "Ivana");
+	strcpy(text[2], "Ivana");
+	strcpy(text[5], "Ivana");
+
+	draw_list_clip();
+	mark_selected();
+}
 
 void tool_dir()
 {
@@ -725,11 +758,43 @@ void tool_dir()
 	mark_selected();
 }
 
+void draw_list_clip()
+{
+	unsigned char col = 0x06;
+	int i;
+	save_cur();
+	for(i = 0; i < 10; i++)
+	{
+		//if(strlen(text[i]) == 0)
+		//	continue;
+		int k = strlen(text[i]);
+		k /= 2;
+		//printk(text[i]);
+		//printk("\n");
+		
+		int col_write_start = TOOL_COL_START + (12 - k);
+		int j;
+		for(j = 0; j < strlen(text[i]); j++)
+		{
+			char c = text[i][j];
+			gotoxy(col_write_start + j, i + 1);
+			
+			__asm__(
+			"movb %2, %%ah\n\t"
+			"movw %%ax, %1\n\t"
+			:: "a" (c), "m" (*(short *)pos), "g" (col)
+			);
+		}
+	}
+	restore_cur();
+}
+
 
 void draw_list()
 {
 	if(list_count == 0)
 		return;
+
 	
 	unsigned char col;
 
@@ -769,6 +834,27 @@ void draw_list()
 
 	restore_cur();
 	
+}
+
+void mark_selected_clip()
+{
+	int j;
+	save_cur();
+	for(j = TOOL_COL_START + 1; j < TOOL_COL_END - 1; j++)
+	{
+		unsigned char colour = 0x30;
+		gotoxy(j, selected_index_clip + 1);
+		__asm__(
+			"movw %0, %%ax\n\t"
+			"movb %1, %%ah\n\t"
+			"movw %%ax, %0\n\t"
+			:: "m" (*(short *)pos), "m" (colour) : "%ax"
+			);
+
+		
+	}
+
+	restore_cur();
 }
 
 void mark_selected()
@@ -844,8 +930,7 @@ void getDirectoriums(void)
 {
 	struct m_inode *dir_inode;
 	struct m_inode *root_inode;
-	short* my_vmem_pos;
-	char* file_name = "/bin";
+	char* file_name = "/";
 
 	root_inode = iget(0x301, 1);
 	current->root = root_inode;
@@ -877,7 +962,6 @@ void getDirectoriums(void)
 	printk("\n");
 
 	iput(node);
-
 	entry++;
 
 	}	
