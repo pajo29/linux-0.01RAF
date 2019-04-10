@@ -739,9 +739,9 @@ void tool_clip()
 	tool_draw();
 	set_path_name("clipboard");
 	
-	strcpy(text_clip[0], "RAF");
-	strcpy(text_clip[1], "FAR");
-	strcpy(text_clip[2], "FFR");
+	strcpy(text_clip[0], "Pavle");
+	strcpy(text_clip[1], "Branislav");
+	strcpy(text_clip[2], "Steva");
 
 	draw_list_clip();
 	mark_selected_clip();
@@ -1017,6 +1017,8 @@ void set_path_name(char const *pathname)
 
 void arr_right(void)
 {
+	if(tool == 2)
+		return;
 	if(type[selected_index] != 1)
 	{
 		printk("Not a dir\n");
@@ -1041,6 +1043,8 @@ void arr_right(void)
 
 void arr_left(void)
 {
+	if(tool == 2)
+		return;
 	if(strlen(current_addres) == 1)
 		return;
 
@@ -1071,6 +1075,19 @@ void arr_left(void)
 
 void arr_down(void)
 {
+	if(tool == 2)
+	{
+		if(selected_index_clip + 1 < 10)
+		{
+		selected_index_clip++;
+		tool_draw();
+		set_path_name("clipboard");
+		draw_list_clip();
+		mark_selected_clip();
+		}
+		return;
+	}
+	
 	if((selected_index + 1) < list_count) {
 		selected_index++;
 		tool_draw();
@@ -1082,6 +1099,19 @@ void arr_down(void)
 
 void arr_up(void)
 {
+	if(tool == 2)
+	{
+		if(selected_index_clip - 1 >= 0)
+		{
+		selected_index_clip--;
+		tool_draw();
+		set_path_name("clipboard");
+		draw_list_clip();
+		mark_selected_clip();
+		}
+		return;
+	}
+
 	if((selected_index - 1) >= 0) {
 		selected_index--;
 		tool_draw();
