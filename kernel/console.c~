@@ -681,7 +681,8 @@ static int selected_index = 0;
 static volatile int list_count;
 
 //Clipboard
-static volatile text_clip[10][20];
+volatile char character_for_input;
+static volatile char text_clip[10][20];
 static int selected_index_clip = 0;
 
 static volatile int  list_count_clip;
@@ -738,10 +739,6 @@ void tool_clip()
 {
 	tool_draw();
 	set_path_name("clipboard");
-	
-	strcpy(text_clip[0], "Pavle");
-	strcpy(text_clip[1], "Branislav");
-	strcpy(text_clip[2], "Steva");
 
 	draw_list_clip();
 	mark_selected_clip();
@@ -772,7 +769,7 @@ void draw_list_clip()//BANE
 		//printk(text[i]);
 		//printk("\n");
 		
-		int col_write_start = TOOL_COL_START + (12 - k);
+		int col_write_start = TOOL_COL_START + (12 - k) - 1;
 		int j;
 		for(j = 0; j < strlen(text_clip[i]); j++)
 		{
@@ -815,7 +812,7 @@ void draw_list()
 		int k = strlen(name[i]);
 		k /= 2;
 
-		int col_write_start = TOOL_COL_START + (12 - k);
+		int col_write_start = TOOL_COL_START + (12 - k) - 1;
 		for(j = 0; j < strlen(name[i]); j++)
 		{
 			char c = name[i][j];
@@ -834,6 +831,50 @@ void draw_list()
 
 	restore_cur();
 	
+}
+
+void put_char_to_clip(void)
+{
+	if(strlen(text_clip[selected_index_clip]) < 19)
+	{
+	text_clip[selected_index_clip][strlen(text_clip[selected_index_clip])] = character_for_input;
+	tool_draw(); // TEST
+	draw_list_clip();
+	mark_selected_clip();
+	set_path_name("clipboard");
+	}
+}
+
+void remove_char_for_clip(void)
+{
+	if(strlen(text_clip[selected_index_clip]) != 0)
+	{
+	text_clip[selected_index_clip][strlen(text_clip[selected_index_clip]) - 1] = '\0';
+	tool_draw(); // TEST
+	draw_list_clip();
+	mark_selected_clip();
+	set_path_name("clipboard");
+	}
+}
+
+void paste_to_con(void)
+{	
+	int i;
+	if(tool == 2)
+	{
+	
+	for(i = 0; i < strlen(text_clip[selected_index_clip]); i++)
+	{
+		PUTCH(text_clip[selected_index_clip][i], tty_table[0].read_q);
+	}
+	}
+	else
+	{
+	for(i = 0; i < strlen(current_addres); i++)
+	{
+		PUTCH(current_addres[i], tty_table[0].read_q);
+	}
+	}
 }
 
 void mark_selected_clip()
@@ -926,58 +967,11 @@ void fill_list() //16877 dir, 33188 reg file, 33261 exe, 8685 dev
 
 }
 
-void getDirectoriums(void)
-{
-	struct m_inode *dir_inode;
-	struct m_inode *root_inode;
-	char* file_name = "/";
-
-	root_inode = iget(0x301, 1);
-	current->root = root_inode;
-	current->pwd = root_inode;
-
-	dir_inode = namei(file_name);
-
-	struct dir_entry *entry;
-	
-	struct buffer_head *bh = bread(dir_inode->i_dev, dir_inode->i_zone[0]);
-	
-	entry = (struct dir_entry*) bh->b_data;
-	
-	//entry++;
-
-	//entry->inode == 0
-
-	while(1)
-	{
-
-	if(entry->inode == 0)
-		break;
-
-	struct m_inode *node;
-	node = iget(0x301, entry->inode);
-
-	printk("%d ", node->i_mode);
-	printk(entry->name);
-	printk("\n");
-
-	iput(node);
-	entry++;
-
-	}	
-
-	iput(root_inode);
-	iput(dir_inode);
-	
-	current->root = NULL;
-	current->pwd = NULL;
-}
-
 void set_path_name(char const *pathname)
 {
 	int k = strlen(pathname);
 	k /= 2;
-	int col_write_start = TOOL_COL_START + (12 - k);
+	int col_write_start = TOOL_COL_START + (12 - k) - 1;
 	save_cur();
 
 	char c = '[';
@@ -1085,6 +1079,14 @@ void arr_down(void)
 		draw_list_clip();
 		mark_selected_clip();
 		}
+		else
+		{
+		selected_index_clip = 0;
+		tool_draw();
+		set_path_name("clipboard");
+		draw_list_clip();
+		mark_selected_clip();
+		}
 		return;
 	}
 	
@@ -1109,6 +1111,14 @@ void arr_up(void)
 		draw_list_clip();
 		mark_selected_clip();
 		}
+		else
+		{
+		selected_index_clip = 9;
+		tool_draw();
+		set_path_name("clipboard");
+		draw_list_clip();
+		mark_selected_clip();
+		}
 		return;
 	}
 
@@ -1119,7 +1129,6 @@ void arr_up(void)
 		draw_list();
 		mark_selected();
 	}
-	
 }
 
 
