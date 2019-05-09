@@ -154,7 +154,12 @@ num:	xorb $2,leds
  *  curosr-key/numeric keypad cursor keys are handled here.
  *  checking for numeric keypad etc.
  */
+
 cursor:
+	//call testArr
+	cld
+	cmpb $1, f1
+	je arrow
 	subb $0x47,%al
 	jb 1f
 	cmpb $12,%al
@@ -301,6 +306,10 @@ do_self:
 	orb $0x80,%al
 4:	andl $0xff,%eax
 	xorl %ebx,%ebx
+	/* Capturing */
+	cld
+	cmpb $1, f3
+	je do_f3
 	call put_queue
 none:	ret
 
@@ -320,11 +329,123 @@ minus:	cmpb $1,e0
  * gotten. Most routines just call do_self, or none, depending if
  * they are make or break.
  */
+
+do_f3:
+movb %al, character_for_input
+call put_char_to_clip
+ret
+
+
+f1: .byte 0
+
+f2: .byte 0
+
+f3: .byte 0
+
+tool_start_:
+movb $1, f2
+movb $0, f3
+jmp con
+
+change_to_clip:
+movb $2, f2
+jmp con
+
+f1_pressed:
+movb $1, f1
+call f1_down
+ret
+
+f1_released:
+movb $0, f1
+call f1_up
+ret
+
+f2_pressed:
+cld
+cmpb $0, f2
+je tool_start_
+cmpb $1, f2
+je change_to_clip
+jmp tool_start_
+con:
+call tool_start
+ret
+
+to_one:
+movb $1, f3
+ret
+
+set_f3:
+cld
+cmpb $0, f3
+je to_one
+movb $0, f3
+ret
+
+f3_pressed:
+cld
+cmpb $2, f2
+je set_f3
+ret
+
+arr_up_:
+call arr_up
+ret
+
+arr_down_:
+call arr_down
+ret
+
+arr_left_:
+call arr_left
+ret
+
+arr_right_:
+call arr_right
+ret
+
+arrow:
+cld
+cmpb $0x48, %al
+je arr_up_
+cmpb $0x50, %al
+je arr_down_
+cmpb $0x4B, %al
+je arr_left_
+cmpb $0x4D, %al
+je arr_right_
+ret
+
+back_space:
+cld
+cmpb $0, f3
+je do_self
+call remove_char_for_clip
+ret
+
+ex:
+jmp do_self
+ret
+
+space:
+call paste_to_con
+ret
+
+do_space:
+cld
+cmpb $0, f2
+je ex
+cld
+cmpb $1, f1
+jne ex
+jmp space
+
 key_table:
 	.long none,do_self,do_self,do_self	/* 00-03 s0 esc 1 2 */
 	.long do_self,do_self,do_self,do_self	/* 04-07 3 4 5 6 */
 	.long do_self,do_self,do_self,do_self	/* 08-0B 7 8 9 0 */
-	.long do_self,do_self,do_self,do_self	/* 0C-0F + ' bs tab */
+	.long do_self,do_self,back_space,do_self	/* 0C-0F + ' bs tab */
 	.long do_self,do_self,do_self,do_self	/* 10-13 q w e r */
 	.long do_self,do_self,do_self,do_self	/* 14-17 t y u i */
 	.long do_self,do_self,do_self,do_self	/* 18-1B o p } ^ */
@@ -335,8 +456,8 @@ key_table:
 	.long do_self,do_self,do_self,do_self	/* 2C-2F z x c v */
 	.long do_self,do_self,do_self,do_self	/* 30-33 b n m , */
 	.long do_self,minus,rshift,do_self	/* 34-37 . - rshift * */
-	.long alt,do_self,caps,func		/* 38-3B alt sp caps f1 */
-	.long func,func,func,func		/* 3C-3F f2 f3 f4 f5 */
+	.long alt,do_space,caps,f1_pressed		/* 38-3B alt sp caps f1 */
+	.long f2_pressed,f3_pressed,func,func		/* 3C-3F f2 f3 f4 f5 */
 	.long func,func,func,func		/* 40-43 f6 f7 f8 f9 */
 	.long func,num,scroll,cursor		/* 44-47 f10 num scr home */
 	.long cursor,cursor,do_self,cursor	/* 48-4B up pgup - left */
@@ -367,7 +488,7 @@ key_table:
 	.long none,none,none,none		/* AC-AF br br br br */
 	.long none,none,none,none		/* B0-B3 br br br br */
 	.long none,none,unrshift,none		/* B4-B7 br br unrshift br */
-	.long unalt,none,uncaps,none		/* B8-BB unalt br uncaps br */
+	.long unalt,none,uncaps,f1_released		/* B8-BB unalt br uncaps br */
 	.long none,none,none,none		/* BC-BF br br br br */
 	.long none,none,none,none		/* C0-C3 br br br br */
 	.long none,none,none,none		/* C4-C7 br br br br */

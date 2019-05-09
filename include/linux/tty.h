@@ -63,6 +63,7 @@ void rs_init(void);
 void con_init(void);
 void tty_init(void);
 
+//void getDirectoriums(void);
 int tty_read(unsigned c, char * buf, int n);
 int tty_write(unsigned c, char * buf, int n);
 

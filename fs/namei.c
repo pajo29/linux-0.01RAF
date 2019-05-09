@@ -193,7 +193,7 @@ static struct buffer_head * add_entry(struct m_inode * dir,
  *	get_dir()
  *
  * Getdir traverses the pathname until it hits the topmost directory.
- * It returns NULL on failure.
+ * It returns NULL on failure. TO BE USED FOR GETTING FILE ADDRES
  */
 static struct m_inode * get_dir(const char * pathname)
 {

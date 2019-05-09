@@ -53,6 +53,7 @@ void buffer_init(void);
 
 typedef char buffer_block[BLOCK_SIZE];
 
+
 struct buffer_head {
 	char * b_data;			/* pointer to data block (1024 bytes) */
 	unsigned short b_dev;		/* device (0 = free) */
@@ -94,7 +95,7 @@ struct m_inode {
 	unsigned short i_num;
 	unsigned short i_count;
 	unsigned char i_lock;
-	unsigned char i_dirt;
+	unsigned char i_dirt; 
 	unsigned char i_pipe;
 	unsigned char i_mount;
 	unsigned char i_seek;
