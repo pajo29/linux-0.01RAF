@@ -71,7 +71,7 @@ int file_write(struct m_inode * inode, struct file * filp, char * buf, int count
 			inode->i_dirt = 1;
 		}
 		i += c;
-		while (c-->0)
+		while (c-->0) //Ovde se vrsi upis i moguca izmena. Na primer za vezbu 1 ovde se kuca.
 			*(p++) = get_fs_byte(buf++);
 		brelse(bh);
 	}

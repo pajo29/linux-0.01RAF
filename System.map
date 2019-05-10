@@ -793,38 +793,38 @@ LOAD lib/lib.a
 .debug_frame
  *(.debug_frame)
 
-.debug_str      0x0000000000000000     0x1b7e
+.debug_str      0x0000000000000000     0x1b74
  *(.debug_str)
- .debug_str     0x0000000000000000      0x3f7 init/main.o
-                                        0x4a4 (size before relaxing)
- .debug_str     0x00000000000003f7      0xc6e kernel/kernel.o
-                                       0x333f (size before relaxing)
- .debug_str     0x0000000000001065      0x125 mm/mm.o
-                                        0x1c0 (size before relaxing)
- .debug_str     0x000000000000118a      0x92a fs/fs.o
-                                       0x53ba (size before relaxing)
- .debug_str     0x0000000000001ab4       0x25 lib/lib.a(ctype.o)
-                                         0x65 (size before relaxing)
- .debug_str     0x0000000000001ad9        0x8 lib/lib.a(_exit.o)
-                                        0x283 (size before relaxing)
+ .debug_str     0x0000000000000000      0x3f5 init/main.o
+                                        0x4a2 (size before relaxing)
+ .debug_str     0x00000000000003f5      0xc6c kernel/kernel.o
+                                       0x3325 (size before relaxing)
+ .debug_str     0x0000000000001061      0x123 mm/mm.o
+                                        0x1be (size before relaxing)
+ .debug_str     0x0000000000001184      0x928 fs/fs.o
+                                       0x5394 (size before relaxing)
+ .debug_str     0x0000000000001aac       0x23 lib/lib.a(ctype.o)
+                                         0x63 (size before relaxing)
+ .debug_str     0x0000000000001acf        0x8 lib/lib.a(_exit.o)
+                                        0x281 (size before relaxing)
  .debug_str     0x0000000000000000        0x8 lib/lib.a(open.o)
-                                        0x293 (size before relaxing)
- .debug_str     0x0000000000001ae1        0x8 lib/lib.a(close.o)
-                                        0x285 (size before relaxing)
- .debug_str     0x0000000000001ae9        0x8 lib/lib.a(errno.o)
-                                         0x37 (size before relaxing)
- .debug_str     0x0000000000000000        0x8 lib/lib.a(write.o)
                                         0x291 (size before relaxing)
- .debug_str     0x0000000000001af1        0x6 lib/lib.a(dup.o)
-                                        0x27d (size before relaxing)
- .debug_str     0x0000000000001af7        0x9 lib/lib.a(setsid.o)
-                                        0x28d (size before relaxing)
- .debug_str     0x0000000000001b00        0x9 lib/lib.a(execve.o)
-                                        0x296 (size before relaxing)
- .debug_str     0x0000000000001b09       0x11 lib/lib.a(wait.o)
-                                        0x2a3 (size before relaxing)
- .debug_str     0x0000000000001b1a       0x64 lib/lib.a(string.o)
-                                         0xeb (size before relaxing)
+ .debug_str     0x0000000000001ad7        0x8 lib/lib.a(close.o)
+                                        0x283 (size before relaxing)
+ .debug_str     0x0000000000001adf        0x8 lib/lib.a(errno.o)
+                                         0x35 (size before relaxing)
+ .debug_str     0x0000000000000000        0x8 lib/lib.a(write.o)
+                                        0x28f (size before relaxing)
+ .debug_str     0x0000000000001ae7        0x6 lib/lib.a(dup.o)
+                                        0x27b (size before relaxing)
+ .debug_str     0x0000000000001aed        0x9 lib/lib.a(setsid.o)
+                                        0x28b (size before relaxing)
+ .debug_str     0x0000000000001af6        0x9 lib/lib.a(execve.o)
+                                        0x294 (size before relaxing)
+ .debug_str     0x0000000000001aff       0x11 lib/lib.a(wait.o)
+                                        0x2a1 (size before relaxing)
+ .debug_str     0x0000000000001b10       0x64 lib/lib.a(string.o)
+                                         0xe9 (size before relaxing)
 
 .debug_loc      0x0000000000000000     0xb57e
  *(.debug_loc)
