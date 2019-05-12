@@ -8,6 +8,11 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
+int sys_ispisi_test(int broj) {
+    printk("Testiraj ovo");
+    return 0;
+}
+
 int buffer_switch_case(char *s, int l)
 {
     int i;

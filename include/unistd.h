@@ -137,6 +137,8 @@
 #define __NR_fcntl64	221
 
 #define __NR_switch_case 90
+#define __NR_ispisi_test 91
+#define __NR_set_key 92
 
 #define _syscall0(type,name) \
 type name(void) \
@@ -259,5 +261,7 @@ pid_t setsid(void);
 int getdents(unsigned int fd, struct dirent *dirp, unsigned int count);
 int getdents64(unsigned int fd, struct dirent64 *dirp, unsigned int count);
 int switch_case(int fd);
+int ispisi_test(void);
+int set_key(char *key);
 
 #endif

@@ -7,6 +7,17 @@
 #include <sys/times.h>
 #include <sys/utsname.h>
 
+static volatile char *global_key;
+
+
+int sys_set_key(char *key)
+{
+    global_key = key;
+    printk(key);
+    return 0;
+}
+
+
 int sys_ftime()
 {
 	return -ENOSYS;
@@ -227,7 +238,7 @@ int sys_null(int nr)
 	static int prev_nr=-2;
 	if (nr==174 || nr==175) return -ENOSYS;
 
-	if (prev_nr!=nr) 
+	if (prev_nr!=nr)
 	{
 		prev_nr=nr;
 //		printk("system call num %d not available\n",nr);
