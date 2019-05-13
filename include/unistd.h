@@ -262,6 +262,6 @@ int getdents(unsigned int fd, struct dirent *dirp, unsigned int count);
 int getdents64(unsigned int fd, struct dirent64 *dirp, unsigned int count);
 int switch_case(int fd);
 int ispisi_test(void);
-int set_key(char *key);
+int set_key(char *key, int len);
 
 #endif

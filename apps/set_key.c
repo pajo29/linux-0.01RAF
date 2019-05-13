@@ -13,7 +13,7 @@ int main(char *args)
 
     char *key = get_argv(args, 1);
 
-    set_key(key);
+    set_key(key, strlen(key));
 
     _exit(0);
 }

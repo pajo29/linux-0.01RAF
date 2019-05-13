@@ -6,14 +6,25 @@
 #include <asm/segment.h>
 #include <sys/times.h>
 #include <sys/utsname.h>
+#include <string.h>
 
-static volatile char *global_key;
+static volatile char global_key[100];
 
 
-int sys_set_key(char *key)
+int sys_set_key(char *key, int len)
 {
-    global_key = key;
-    printk(key);
+    char test[len];
+    char c;
+    int i;
+    for(i = 0; i < len; i++) {
+        c = get_fs_byte(key + i);
+        test[i] = c;
+    }
+
+    strcpy(global_key, test);
+
+    write(1, test, len);
+
     return 0;
 }
 
