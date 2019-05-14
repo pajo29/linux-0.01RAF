@@ -11,6 +11,12 @@
 static volatile char global_key[100];
 
 
+int sys_generate_key_(int level)
+{
+    printk("\nKljuc generisan..\n");
+    return 0;
+}
+
 int sys_set_key(char *key, int len)
 {
     clear_key_();

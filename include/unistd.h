@@ -139,6 +139,7 @@
 #define __NR_switch_case 90
 #define __NR_clear_key 91
 #define __NR_set_key 92
+#define __NR_generate_key_ 93
 
 #define _syscall0(type,name) \
 type name(void) \
@@ -263,5 +264,6 @@ int getdents64(unsigned int fd, struct dirent64 *dirp, unsigned int count);
 int switch_case(int fd);
 int clear_key(void);
 int set_key(char *key, int len);
+int generate_key_(int level);
 
 #endif
