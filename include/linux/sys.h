@@ -77,7 +77,7 @@ extern int sys_getdents64();
 extern int sys_fcntl64();
 extern int sys_null();	/* not implemented sys_call */
 extern int sys_switch_case();
-extern int sys_ispisi_test();
+extern int sys_clear_key();
 extern int sys_set_key();
 
 fn_ptr sys_call_table[] = { sys_setup, sys_exit, sys_fork, sys_read,
@@ -97,7 +97,7 @@ sys_getpgrp,sys_setsid, sys_null /*67*/,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,
 /* 80 */sys_null,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,
-/* 90 */sys_switch_case,sys_ispisi_test,sys_set_key,sys_null,sys_null,
+/* 90 */sys_switch_case,sys_clear_key,sys_set_key,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,
 /* 100 */sys_null,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_stat,sys_lstat,sys_fstat,sys_null,

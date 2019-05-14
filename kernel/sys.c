@@ -13,21 +13,35 @@ static volatile char global_key[100];
 
 int sys_set_key(char *key, int len)
 {
-    char test[len];
+    clear_key_();
+
     char c;
     int i;
     for(i = 0; i < len; i++) {
         c = get_fs_byte(key + i);
-        test[i] = c;
+        global_key[i] = c;
     }
-
-    strcpy(global_key, test);
-
-    write(1, test, len);
 
     return 0;
 }
 
+int sys_clear_key(void)
+{
+    clear_key_();
+    printk("\nKljuc izbrisan\n");
+    return 0;
+}
+
+
+int clear_key_()
+{
+    int i;
+    for(i = 0; i < 100; i++)
+    {
+        global_key[i] = 0;
+    }
+    return 0;
+}
 
 int sys_ftime()
 {
