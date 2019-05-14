@@ -13,6 +13,40 @@ static volatile char global_key[100];
 
 int sys_generate_key_(int level)
 {
+    int count = 4;
+    while(level > 1)
+    {
+        count = count * 2;
+        level--;
+    }
+    int i = 0;
+
+    int number = CURRENT_TIME * (-1);
+    int add_number = 4375;
+    while(count > 0)
+    {
+        if(number == 0)
+        {
+            number = CURRENT_TIME * (-1) + add_number;
+            add_number += 4375;
+        }
+
+        int get_number = number % 100;
+        number = number / 100;
+
+        if((get_number >= 65 && get_number <= 90) || (get_number >= 97 && get_number <= 122))
+        {
+            global_key[i++] = get_number;
+            count--;
+        }
+
+    }
+
+    int k;
+    for(k = 0; k < i; k++)
+    {
+        printk("%c", global_key[k]);
+    }
     printk("\nKljuc generisan..\n");
     return 0;
 }
@@ -34,7 +68,7 @@ int sys_set_key(char *key, int len)
 int sys_clear_key(void)
 {
     clear_key_();
-    printk("\nKljuc izbrisan\n");
+    printk("Kljuc izbrisan..\n");
     return 0;
 }
 

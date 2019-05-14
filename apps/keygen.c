@@ -17,7 +17,7 @@ int main(char *args)
 
     int level = atoi(get_argv(args, 1));
 
-    if(level < 0 || level > 3)
+    if(level < 1 || level > 3)
     {
         write(1, "\nKljuc nije u odgovarajucem opsegu. Opseg je 1 - 3. Prekid.\n", strlen("\nKljuc nije u odgovarajucem opsegu. Opseg je 1 - 3. Prekid.\n"));
         _exit(1);
