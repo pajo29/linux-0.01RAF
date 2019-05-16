@@ -75,7 +75,7 @@ int buffer_encr(char *buffer, int len)
     for(i = 0; i < gb; i++)
     {
         int num = index_array[i];
-        while(num < 1024)
+        while(num < strlen(old_buffer))
         {
             buffer[counter++] = old_buffer[num];
             num += gb;
