@@ -253,43 +253,43 @@ LOAD lib/lib.a
                 0x0000000000009f14                copy_to_buffer
                 0x0000000000009f5e                to_lower_case
                 0x0000000000009fbf                buffer_encr
-                0x000000000000a132                file_encr
-                0x000000000000a1f9                sys_encr
-                0x000000000000a239                partition
-                0x000000000000a2c6                sort_index_and_global
-                0x000000000000a34b                sys_generate_key_
-                0x000000000000a4a1                clear_key_
-                0x000000000000a4b8                sys_clear_key
-                0x000000000000a4d5                sys_set_key
-                0x000000000000a506                sys_ftime
-                0x000000000000a50c                sys_mknod
-                0x000000000000a512                sys_break
-                0x000000000000a518                sys_mount
-                0x000000000000a51e                sys_umount
-                0x000000000000a524                sys_ustat
-                0x000000000000a52a                sys_ptrace
-                0x000000000000a530                sys_stty
-                0x000000000000a536                sys_gtty
-                0x000000000000a53c                sys_rename
-                0x000000000000a542                sys_prof
-                0x000000000000a548                sys_setgid
-                0x000000000000a5a5                sys_acct
-                0x000000000000a5ab                sys_phys
-                0x000000000000a5b1                sys_lock
-                0x000000000000a5b7                sys_mpx
-                0x000000000000a5bd                sys_ulimit
-                0x000000000000a5c3                sys_time
-                0x000000000000a616                sys_setuid
-                0x000000000000a66f                sys_stime
-                0x000000000000a6bc                sys_times
-                0x000000000000a715                sys_brk
-                0x000000000000a748                sys_setpgid
-                0x000000000000a7bd                sys_getpgrp
-                0x000000000000a7c9                sys_setsid
-                0x000000000000a81e                sys_oldolduname
-                0x000000000000a836                sys_uname
-                0x000000000000a883                sys_umask
-                0x000000000000a8a1                sys_null
+                0x000000000000a13c                file_encr
+                0x000000000000a203                sys_encr
+                0x000000000000a243                partition
+                0x000000000000a2d0                sort_index_and_global
+                0x000000000000a355                sys_generate_key_
+                0x000000000000a4ab                clear_key_
+                0x000000000000a4c2                sys_clear_key
+                0x000000000000a4df                sys_set_key
+                0x000000000000a510                sys_ftime
+                0x000000000000a516                sys_mknod
+                0x000000000000a51c                sys_break
+                0x000000000000a522                sys_mount
+                0x000000000000a528                sys_umount
+                0x000000000000a52e                sys_ustat
+                0x000000000000a534                sys_ptrace
+                0x000000000000a53a                sys_stty
+                0x000000000000a540                sys_gtty
+                0x000000000000a546                sys_rename
+                0x000000000000a54c                sys_prof
+                0x000000000000a552                sys_setgid
+                0x000000000000a5af                sys_acct
+                0x000000000000a5b5                sys_phys
+                0x000000000000a5bb                sys_lock
+                0x000000000000a5c1                sys_mpx
+                0x000000000000a5c7                sys_ulimit
+                0x000000000000a5cd                sys_time
+                0x000000000000a620                sys_setuid
+                0x000000000000a679                sys_stime
+                0x000000000000a6c6                sys_times
+                0x000000000000a71f                sys_brk
+                0x000000000000a752                sys_setpgid
+                0x000000000000a7c7                sys_getpgrp
+                0x000000000000a7d3                sys_setsid
+                0x000000000000a828                sys_oldolduname
+                0x000000000000a840                sys_uname
+                0x000000000000a88d                sys_umask
+                0x000000000000a8ab                sys_null
                 0x000000000000a8d0                release
                 0x000000000000a92a                do_kill
                 0x000000000000aba3                sys_kill
@@ -453,16 +453,16 @@ LOAD lib/lib.a
  *fill*         0x0000000000010c0d       0x13 00
  .rodata        0x0000000000010c20      0x270 kernel/kernel.o
  .rodata.str1.1
-                0x0000000000010e90      0x2c7 kernel/kernel.o
-                                        0x2d1 (size before relaxing)
- *fill*         0x0000000000011157        0x1 00
+                0x0000000000010e90      0x2ba kernel/kernel.o
+                                        0x2c4 (size before relaxing)
+ *fill*         0x000000000001114a        0x2 00
  .rodata.str1.4
-                0x0000000000011158      0x22c kernel/kernel.o
+                0x000000000001114c      0x22c kernel/kernel.o
  .rodata.str1.4
-                0x0000000000011384       0xe9 mm/mm.o
+                0x0000000000011378       0xe9 mm/mm.o
  .rodata.str1.1
-                0x000000000001146d       0x68 mm/mm.o
- *fill*         0x00000000000114d5        0xb 00
+                0x0000000000011461       0x68 mm/mm.o
+ *fill*         0x00000000000114c9       0x17 00
  .rodata        0x00000000000114e0       0xc4 fs/fs.o
  .rodata.str1.1
                 0x00000000000115a4      0x32c fs/fs.o
@@ -750,23 +750,23 @@ LOAD lib/lib.a
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x0000000000000000    0x1b9ed
+.debug_info     0x0000000000000000    0x1b9bb
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x0000000000000000      0xccf init/main.o
- .debug_info    0x0000000000000ccf     0x9cf9 kernel/kernel.o
- .debug_info    0x000000000000a9c8      0x4d6 mm/mm.o
- .debug_info    0x000000000000ae9e     0xe424 fs/fs.o
- .debug_info    0x00000000000192c2       0x70 lib/lib.a(ctype.o)
- .debug_info    0x0000000000019332      0x3af lib/lib.a(_exit.o)
- .debug_info    0x00000000000196e1      0x403 lib/lib.a(open.o)
- .debug_info    0x0000000000019ae4      0x3ce lib/lib.a(close.o)
- .debug_info    0x0000000000019eb2       0x3f lib/lib.a(errno.o)
- .debug_info    0x0000000000019ef1      0x43a lib/lib.a(write.o)
- .debug_info    0x000000000001a32b      0x3ce lib/lib.a(dup.o)
- .debug_info    0x000000000001a6f9      0x3cb lib/lib.a(setsid.o)
- .debug_info    0x000000000001aac4      0x3fc lib/lib.a(execve.o)
- .debug_info    0x000000000001aec0      0x428 lib/lib.a(wait.o)
- .debug_info    0x000000000001b2e8      0x705 lib/lib.a(string.o)
+ .debug_info    0x0000000000000ccf     0x9cc7 kernel/kernel.o
+ .debug_info    0x000000000000a996      0x4d6 mm/mm.o
+ .debug_info    0x000000000000ae6c     0xe424 fs/fs.o
+ .debug_info    0x0000000000019290       0x70 lib/lib.a(ctype.o)
+ .debug_info    0x0000000000019300      0x3af lib/lib.a(_exit.o)
+ .debug_info    0x00000000000196af      0x403 lib/lib.a(open.o)
+ .debug_info    0x0000000000019ab2      0x3ce lib/lib.a(close.o)
+ .debug_info    0x0000000000019e80       0x3f lib/lib.a(errno.o)
+ .debug_info    0x0000000000019ebf      0x43a lib/lib.a(write.o)
+ .debug_info    0x000000000001a2f9      0x3ce lib/lib.a(dup.o)
+ .debug_info    0x000000000001a6c7      0x3cb lib/lib.a(setsid.o)
+ .debug_info    0x000000000001aa92      0x3fc lib/lib.a(execve.o)
+ .debug_info    0x000000000001ae8e      0x428 lib/lib.a(wait.o)
+ .debug_info    0x000000000001b2b6      0x705 lib/lib.a(string.o)
 
 .debug_abbrev   0x0000000000000000     0x464e
  *(.debug_abbrev)
@@ -840,21 +840,21 @@ LOAD lib/lib.a
  .debug_str     0x0000000000001c37       0x64 lib/lib.a(string.o)
                                          0xe9 (size before relaxing)
 
-.debug_loc      0x0000000000000000     0xc15a
+.debug_loc      0x0000000000000000     0xc1ad
  *(.debug_loc)
  .debug_loc     0x0000000000000000      0x256 init/main.o
- .debug_loc     0x0000000000000256     0x4d30 kernel/kernel.o
- .debug_loc     0x0000000000004f86      0x640 mm/mm.o
- .debug_loc     0x00000000000055c6     0x6582 fs/fs.o
- .debug_loc     0x000000000000bb48       0x2c lib/lib.a(_exit.o)
- .debug_loc     0x000000000000bb74       0x3f lib/lib.a(open.o)
- .debug_loc     0x000000000000bbb3       0x3f lib/lib.a(close.o)
- .debug_loc     0x000000000000bbf2       0x96 lib/lib.a(write.o)
- .debug_loc     0x000000000000bc88       0x3f lib/lib.a(dup.o)
- .debug_loc     0x000000000000bcc7       0x13 lib/lib.a(setsid.o)
- .debug_loc     0x000000000000bcda       0x57 lib/lib.a(execve.o)
- .debug_loc     0x000000000000bd31       0x83 lib/lib.a(wait.o)
- .debug_loc     0x000000000000bdb4      0x3a6 lib/lib.a(string.o)
+ .debug_loc     0x0000000000000256     0x4d83 kernel/kernel.o
+ .debug_loc     0x0000000000004fd9      0x640 mm/mm.o
+ .debug_loc     0x0000000000005619     0x6582 fs/fs.o
+ .debug_loc     0x000000000000bb9b       0x2c lib/lib.a(_exit.o)
+ .debug_loc     0x000000000000bbc7       0x3f lib/lib.a(open.o)
+ .debug_loc     0x000000000000bc06       0x3f lib/lib.a(close.o)
+ .debug_loc     0x000000000000bc45       0x96 lib/lib.a(write.o)
+ .debug_loc     0x000000000000bcdb       0x3f lib/lib.a(dup.o)
+ .debug_loc     0x000000000000bd1a       0x13 lib/lib.a(setsid.o)
+ .debug_loc     0x000000000000bd2d       0x57 lib/lib.a(execve.o)
+ .debug_loc     0x000000000000bd84       0x83 lib/lib.a(wait.o)
+ .debug_loc     0x000000000000be07      0x3a6 lib/lib.a(string.o)
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -874,10 +874,10 @@ LOAD lib/lib.a
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x0000000000000000      0x738
+.debug_ranges   0x0000000000000000      0x748
  *(.debug_ranges)
- .debug_ranges  0x0000000000000000      0x430 kernel/kernel.o
- .debug_ranges  0x0000000000000430      0x308 fs/fs.o
+ .debug_ranges  0x0000000000000000      0x440 kernel/kernel.o
+ .debug_ranges  0x0000000000000440      0x308 fs/fs.o
 
 .gnu.attributes
  *(.gnu.attributes)

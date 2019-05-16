@@ -69,7 +69,7 @@ int buffer_encr(char *buffer, int len)
     char global_key_local[gb];
     to_lower_case(global_key, global_key_local);
 
-    sort_index_and_global(index_array, global_key_local, 0, gb);
+    sort_index_and_global(index_array, global_key_local, 0, gb - 1);
 
     int counter = 0;//TODO
     for(i = 0; i < gb; i++)
