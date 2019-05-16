@@ -55,6 +55,97 @@ int file_encr(struct m_inode * inode, struct file * filp, char * buf, int count)
 int buffer_encr(char *buffer, int len)
 {
 
+    int n = strlen(buffer);
+    char old_buffer[n];
+    copy_to_buffer(old_buffer, buffer);
+    int gb = strlen(global_key);
+
+    int index_array[gb];
+
+    int i;
+    for(i = 0; i < gb; i++)
+        index_array[i] = i;
+
+    char global_key_local[gb];
+    to_lower_case(global_key, global_key_local);
+
+    sort_index_and_global(index_array, global_key_local, 0, gb);
+
+    int counter = 0;
+    for(i = 0; i < gb; i++)
+    {
+        int num = index_array[i];
+        while(num < 1024)
+        {
+            buffer[counter++] = old_buffer[num];
+            num += gb;
+        }
+    }
+
+    return 0;
+}
+
+void copy_to_buffer(char *old_buffer, char *buffer)
+{
+    int i = 0;
+    for(i = 0; i < strlen(buffer); i++)
+        old_buffer[i] = buffer[i];
+}
+
+void sort_index_and_global(int *index_array, char *global_key_local, int low, int high)
+{
+    if(low < high)
+    {
+        int part = partition(index_array, global_key_local, low, high);
+
+        sort_index_and_global(index_array, global_key_local, low, part - 1);
+        sort_index_and_global(index_array, global_key_local, part + 1, high);
+    }
+}
+
+int partition(int *index_array, char *global_key_local, int low, int high)
+{
+    char pivot = global_key_local[high];
+    int i = (low - 1);
+
+    int j;
+    for(j = low; j < high; j++)
+    {
+        if(global_key_local[j] <= pivot)
+        {
+            i++;
+
+            char tmp = global_key_local[i];
+            global_key_local[i] = global_key_local[j];
+            global_key_local[j] = tmp;
+
+            int numTmp = index_array[i];
+            index_array[i] = index_array[j];
+            index_array[j] = numTmp;
+        }
+    }
+
+    char tmp = global_key_local[i + 1];
+    global_key_local[i + 1] = global_key_local[high];
+    global_key_local[high] = tmp;
+
+    int numTmp = index_array[i + 1];
+    index_array[i + 1] = index_array[high];
+    index_array[high] = numTmp;
+
+    return i + 1;
+}
+
+void to_lower_case(char* buffer, char* new_string)
+{
+    int i;
+    for(i = 0; i < strlen(buffer); i++)
+    {
+        if(buffer[i] >= 65 && buffer[i] <= 90)
+            new_string[i] = buffer[i] + 32;
+        else
+            new_string[i] = buffer[i];
+    }
 }
 
 int sys_generate_key_(int level)
@@ -88,12 +179,13 @@ int sys_generate_key_(int level)
 
     }
 
+    printk("Generisan kljuc: ");
     int k;
     for(k = 0; k < i; k++)
     {
         printk("%c", global_key[k]);
     }
-    printk("\nKljuc generisan..\n");
+    printk("\n");
     return 0;
 }
 
