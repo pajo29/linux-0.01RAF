@@ -7,3 +7,4 @@ _syscall0(int,clear_key);
 
 _syscall1(int,generate_key_,int,level);
 
+_syscall1(int,encr,int,fd);
