@@ -71,7 +71,7 @@ int buffer_encr(char *buffer, int len)
 
     sort_index_and_global(index_array, global_key_local, 0, gb);
 
-    int counter = 0;
+    int counter = 0;//TODO
     for(i = 0; i < gb; i++)
     {
         int num = index_array[i];
