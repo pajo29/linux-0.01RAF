@@ -10,6 +10,10 @@
 
 static volatile char global_key[100];
 
+int sys_decr(int fd)
+{
+
+}
 
 int sys_encr(int fd)
 {

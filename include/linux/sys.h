@@ -81,6 +81,7 @@ extern int sys_clear_key();
 extern int sys_set_key();
 extern int sys_generate_key_();
 extern int sys_encr();
+extern int sys_decr();
 
 fn_ptr sys_call_table[] = { sys_setup, sys_exit, sys_fork, sys_read,
 sys_write, sys_open, sys_close, sys_waitpid, sys_creat, sys_link,
@@ -100,7 +101,7 @@ sys_null,sys_null,sys_null,sys_null,sys_null,
 /* 80 */sys_null,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,
 /* 90 */sys_switch_case,sys_clear_key,sys_set_key,sys_generate_key_,sys_encr,
-sys_null,sys_null,sys_null,sys_null,sys_null,
+sys_decr,sys_null,sys_null,sys_null,sys_null,
 /* 100 */sys_null,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_stat,sys_lstat,sys_fstat,sys_null,
 /* 110 */sys_null,sys_null,sys_null,sys_null,sys_null,

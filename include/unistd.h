@@ -141,6 +141,7 @@
 #define __NR_set_key 92
 #define __NR_generate_key_ 93
 #define __NR_encr 94
+#define __NR_decr 95
 
 #define _syscall0(type,name) \
 type name(void) \
@@ -267,5 +268,6 @@ int clear_key(void);
 int set_key(char *key, int len);
 int generate_key_(int level);
 int encr(int fd);
+int decr(int fd);
 
 #endif
