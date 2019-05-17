@@ -12,7 +12,75 @@ static volatile char global_key[100];
 
 int sys_decr(int fd)
 {
+    struct file * file;
+    struct m_inode *inode;
 
+    if (fd >= NR_OPEN || !(file=current->filp[fd]))
+        return -EINVAL;
+
+    inode = file->f_inode;
+
+    file_decr(inode, file);
+    return 0;
+}
+
+int file_decr(struct m_inode * inode, struct file * filp, char * buf, int count)
+{
+    int left,chars,nr;
+	struct buffer_head * bh;
+
+	if ((left=count)<=0)
+		return 0;
+	while (left) {
+		if ((nr = bmap(inode,(filp->f_pos)/BLOCK_SIZE))) {
+			if (!(bh=bread(inode->i_dev,nr)))
+				break;
+		} else
+			break;
+		nr = filp->f_pos % BLOCK_SIZE;
+		chars = BLOCK_SIZE-nr;
+		filp->f_pos += chars;
+		left -= chars;
+		if (bh) {
+			buffer_decr(bh->b_data, 1024);
+			bh->b_dirt = 1;
+			brelse(bh);
+		}
+	}
+	inode->i_atime = CURRENT_TIME;
+	return 0;
+}
+
+int buffer_decr(char *buffer, int len)
+{
+    int n = strlen(buffer);
+    char old_buffer[n];
+    copy_to_buffer(old_buffer, buffer);
+    int gb = strlen(global_key);
+
+    int index_array[gb];
+
+    int i;
+    for(i = 0; i < gb; i++)
+        index_array[i] = i;
+
+    char global_key_local[gb];
+    to_lower_case(global_key, global_key_local);
+
+    sort_index_and_global(index_array, global_key_local, 0, gb - 1);
+
+    int counter = 0;
+    for(i = 0; i < gb; i++)
+    {
+        int num = index_array[i];
+        while(num < strlen(old_buffer))
+        {
+            buffer[num] = old_buffer[counter++];
+            num += gb;
+        }
+    }
+
+    return 0;
 }
 
 int sys_encr(int fd)
