@@ -53,9 +53,8 @@ int file_decr(struct m_inode * inode, struct file * filp, char * buf, int count)
 
 int buffer_decr(char *buffer, int len)
 {
-    int n = strlen(buffer);
-    char old_buffer[n];
-    copy_to_buffer(old_buffer, buffer);
+    char old_buffer[len];
+    copy_to_buffer(old_buffer, buffer, len);
     int gb = strlen(global_key);
 
     int index_array[gb];
@@ -73,7 +72,7 @@ int buffer_decr(char *buffer, int len)
     for(i = 0; i < gb; i++)
     {
         int num = index_array[i];
-        while(num < strlen(old_buffer))
+        while(num < len)
         {
             buffer[num] = old_buffer[counter++];
             num += gb;
@@ -126,10 +125,8 @@ int file_encr(struct m_inode * inode, struct file * filp, char * buf, int count)
 
 int buffer_encr(char *buffer, int len)
 {
-
-    int n = strlen(buffer);
-    char old_buffer[n];
-    copy_to_buffer(old_buffer, buffer);
+    char old_buffer[len];
+    copy_to_buffer(old_buffer, buffer, len);
     int gb = strlen(global_key);
 
     int index_array[gb];
@@ -143,11 +140,11 @@ int buffer_encr(char *buffer, int len)
 
     sort_index_and_global(index_array, global_key_local, 0, gb - 1);
 
-    int counter = 0;//TODO
+    int counter = 0;
     for(i = 0; i < gb; i++)
     {
         int num = index_array[i];
-        while(num < strlen(old_buffer))
+        while(num < len)
         {
             buffer[counter++] = old_buffer[num];
             num += gb;
@@ -157,10 +154,10 @@ int buffer_encr(char *buffer, int len)
     return 0;
 }
 
-void copy_to_buffer(char *old_buffer, char *buffer)
+void copy_to_buffer(char *old_buffer, char *buffer, int len)
 {
     int i = 0;
-    for(i = 0; i < strlen(buffer); i++)
+    for(i = 0; i < len; i++)
         old_buffer[i] = buffer[i];
 }
 
@@ -230,6 +227,8 @@ int sys_generate_key_(int level)
     }
     int i = 0;
 
+    printk("Generisan kljuc: ");
+
     int number = CURRENT_TIME * (-1);
     int add_number = 4375;
     while(count > 0)
@@ -245,17 +244,11 @@ int sys_generate_key_(int level)
 
         if((get_number >= 65 && get_number <= 90) || (get_number >= 97 && get_number <= 122))
         {
-            global_key[i++] = get_number;
+            char c = get_number;
+            printk("%c", c);
             count--;
         }
 
-    }
-
-    printk("Generisan kljuc: ");
-    int k;
-    for(k = 0; k < i; k++)
-    {
-        printk("%c", global_key[k]);
     }
     printk("\n");
     return 0;
