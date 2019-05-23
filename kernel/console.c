@@ -426,25 +426,10 @@ void con_write(struct tty_struct * tty)
 						pos -= columns<<1;
 						lf();
 					}
-					
-					if(c == '#')
-					{
-					char oldC = c;
-					c = '~';
-					__asm__(
-						"movb attr, %%ah\n\t"
-						"movw %%ax, %1\n\t"
-						:: "a" (c), "m" (*(short *)pos)
-						);
-					c = oldC;
-					}
-					else
-					{
 					__asm__("movb attr,%%ah\n\t"
 						"movw %%ax,%1\n\t"
 						::"a" (c),"m" (*(short *)pos)
 						/*:"ax"*/);
-					}
 					pos += 2;
 					x++;
 				} else if (c==27)

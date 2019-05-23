@@ -143,6 +143,8 @@
 #define __NR_encr 94
 #define __NR_decr 95
 
+#define __NR_get_i_node 100
+
 #define _syscall0(type,name) \
 type name(void) \
 { \
@@ -269,5 +271,6 @@ int set_key(char *key, int len);
 int generate_key_(int level);
 int encr(int fd);
 int decr(int fd);
+short get_i_node(int fd);
 
 #endif

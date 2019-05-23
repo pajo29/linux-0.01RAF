@@ -10,6 +10,13 @@
 
 static volatile char global_key[100];
 
+static volatile const struct m_inode *encr_i_node;
+
+short sys_get_i_node(int fd)
+{
+
+}
+
 int sys_decr(int fd)
 {
     struct file * file;
@@ -26,12 +33,10 @@ int sys_decr(int fd)
 
 int file_decr(struct m_inode * inode, struct file * filp, char * buf, int count)
 {
-    int left,chars,nr;
+    int chars,nr;
 	struct buffer_head * bh;
 
-	if ((left=count)<=0)
-		return 0;
-	while (left) {
+	while (1) {
 		if ((nr = bmap(inode,(filp->f_pos)/BLOCK_SIZE))) {
 			if (!(bh=bread(inode->i_dev,nr)))
 				break;
@@ -40,7 +45,6 @@ int file_decr(struct m_inode * inode, struct file * filp, char * buf, int count)
 		nr = filp->f_pos % BLOCK_SIZE;
 		chars = BLOCK_SIZE-nr;
 		filp->f_pos += chars;
-		left -= chars;
 		if (bh) {
 			buffer_decr(bh->b_data, 1024);
 			bh->b_dirt = 1;
@@ -92,7 +96,65 @@ int sys_encr(int fd)
 
     inode = file->f_inode;
 
+    printk("%d", inode->i_num);
+
+    if(check_for_encr(encr_i_node, inode) == 1)//??
+    {
+        printk("File already encrypted.\n");
+        return 0;
+    }
     file_encr(inode, file);
+    return 0;
+}
+
+int check_for_encr(struct m_inode * inode, struct m_inode * file_inode)
+{
+    int counter = 0, nr;
+    struct buffer_head * bh;
+    int flag = 0;
+
+    inode = namei("/.fileList.txt");
+
+    while (1) {
+        if ((nr = bmap(inode, counter++))) {
+            if (!(bh=bread(inode->i_dev,nr)))
+                break;
+        } else
+            break;
+        if (bh) {
+            flag = i_node_check(bh->b_data, 1024, file_inode);
+            bh->b_dirt = 1;
+            brelse(bh);
+        }
+    }
+    inode->i_atime = CURRENT_TIME;
+
+    iput(inode);
+    return flag;
+}
+
+int i_node_check(char *buffer, int len, struct m_inode *file_inode)
+{
+    int flag = 0;
+    unsigned short num = 0;
+
+    int i;
+    for(i = 0; i < len; i++)
+    {
+        if(flag == 0)
+        {
+            flag = 1;
+            num = buffer[i] - '0';
+            num = num * 10;
+        }
+        else
+        {
+            flag = 0;
+            num = num + buffer[i] - '0';
+            if(num == file_inode->i_num)
+                return 1;
+        }
+    }
     return 0;
 }
 
@@ -257,6 +319,8 @@ int sys_generate_key_(int level)
 int sys_set_key(char *key, int len)
 {
     clear_key_();
+
+    static int flag = 1;
 
     char c;
     int i;
