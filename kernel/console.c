@@ -94,7 +94,7 @@ static void scrup(void)
 		pos += columns<<1;
 		scr_end += columns<<1;
 		if (scr_end>SCREEN_END) {
-			
+
 			int d0,d1,d2,d3;
 			__asm__ __volatile("cld\n\t"
 				"rep\n\t"
@@ -118,7 +118,7 @@ static void scrup(void)
 			__asm__ __volatile("cld\n\t"
 				"rep\n\t"
 				"stosl"
-				:"=&a" (d0), "=&c" (d1), "=&D" (d2) 
+				:"=&a" (d0), "=&c" (d1), "=&D" (d2)
 				:"0" (0x07200720),
 				"1" (columns>>1),
 				"2" (scr_end-(columns<<1))
@@ -413,7 +413,7 @@ void con_write(struct tty_struct * tty)
 {
 	int nr;
 	char c;
-	
+
 
 	nr = CHARS(tty->write_q);
 	while (nr--) {
@@ -597,7 +597,7 @@ void f1_up(void) {f1_down_flag = 0;}
 void tool_draw(void)
 {
 	save_cur();
-	
+
 	char c = '#';
 	int i, j;
 	for(i = TOOL_COL_START; i < TOOL_COL_END - 1; i++) //UP COLUMN DRAW
@@ -659,7 +659,7 @@ static volatile struct m_inode *dir_inode;
 static volatile struct m_inode *root_inode;
 
 //File explorer
-static volatile int type[10]; 
+static volatile int type[10];
 static volatile unsigned short inode[10];
 static volatile char name[10][20];
 static int selected_index = 0;
@@ -678,7 +678,7 @@ static volatile char current_addres[20];
 
 void tool_start(void)
 {
-	
+
 	if(tool == 1)
 		{
 		tool = 2;
@@ -708,7 +708,7 @@ void openR(void)
 		root_inode = iget(0x301, 1);
 		current->root = root_inode;
 		current->pwd = root_inode;
-		dir_inode = namei(current_addres);	
+		dir_inode = namei(current_addres);
 }
 
 void closeR(void)
@@ -733,9 +733,9 @@ void tool_dir()
 {
 	tool_draw();
 	set_path_name(current_addres);
-	
+
 	fill_list();
-	
+
 	draw_list();
 	mark_selected();
 }
@@ -753,14 +753,14 @@ void draw_list_clip()//BANE
 		k /= 2;
 		//printk(text[i]);
 		//printk("\n");
-		
+
 		int col_write_start = TOOL_COL_START + (12 - k) - 1;
 		int j;
 		for(j = 0; j < strlen(text_clip[i]); j++)
 		{
 			char c = text_clip[i][j];
 			gotoxy(col_write_start + j, i + 1);
-			
+
 			__asm__(
 			"movb %2, %%ah\n\t"
 			"movw %%ax, %1\n\t"
@@ -777,7 +777,7 @@ void draw_list()
 	if(list_count == 0)
 		return;
 
-	
+
 	unsigned char col;
 
 	int i;
@@ -801,7 +801,7 @@ void draw_list()
 		for(j = 0; j < strlen(name[i]); j++)
 		{
 			char c = name[i][j];
-			
+
 			gotoxy(col_write_start + j, i + 1);
 
 			__asm__(
@@ -810,12 +810,12 @@ void draw_list()
 			:: "a" (c), "m" (*(short *)pos), "g" (col)
 			);
 
-		}	
+		}
 	}
 
 
 	restore_cur();
-	
+
 }
 
 void put_char_to_clip(void)
@@ -843,11 +843,11 @@ void remove_char_for_clip(void)
 }
 
 void paste_to_con(void)
-{	
+{
 	int i;
 	if(tool == 2)
 	{
-	
+
 	for(i = 0; i < strlen(text_clip[selected_index_clip]); i++)
 	{
 		PUTCH(text_clip[selected_index_clip][i], tty_table[0].read_q);
@@ -881,7 +881,7 @@ void mark_selected_clip()
 			:: "m" (*(short *)pos), "m" (colour) : "%ax"
 			);
 
-		
+
 	}
 
 	restore_cur();
@@ -904,7 +904,7 @@ void mark_selected()
 			:: "m" (*(short *)pos), "m" (colour) : "%ax"
 			);
 
-		
+
 	}
 
 	restore_cur();
@@ -914,7 +914,7 @@ void fill_list() //16877 dir, 33188 reg file, 33261 exe, 8685 dev
 {
 	struct dir_entry *entry;
 	struct buffer_head *bh = bread(dir_inode->i_dev, dir_inode->i_zone[0]);
-	
+
 	entry = (struct dir_entry*) bh->b_data;
 
 
@@ -926,11 +926,11 @@ void fill_list() //16877 dir, 33188 reg file, 33261 exe, 8685 dev
 
 		if(entry->name[0] != '.')
 		{
-		
+
 		struct m_inode *node;
 		node = iget(0x301, entry->inode);
-		
-		
+
+
 		int type_f = -1;
 
 		if(node->i_mode == 16877)
@@ -975,7 +975,7 @@ void set_path_name(char const *pathname)
 	int i;
 	for(i = 0; i < n; i++)
 	{
-		
+
 	gotoxy(col_write_start + i, 0);
 		__asm__(
 			"movb attr, %%ah\n\t"
@@ -991,11 +991,11 @@ void set_path_name(char const *pathname)
 			"movw %%ax, %1\n\t"
 			:: "a" (c), "m" (*(short *)pos)
 			);
-		
 
-	
+
+
 	restore_cur();
-	
+
 }
 
 void arr_right(void)
@@ -1013,7 +1013,7 @@ void arr_right(void)
 	tool_draw();
 	set_path_name(current_addres);
 	fill_list();
-	
+
 	draw_list();
 	if(list_count == 0)
 		return;
@@ -1021,7 +1021,7 @@ void arr_right(void)
 	selected_index = 0;
 	mark_selected();
 	closeR();
-	
+
 }
 
 void arr_left(void)
@@ -1037,7 +1037,7 @@ void arr_left(void)
 		if(current_addres[i] == '/')
 		{
 			current_addres[++i] = '\0';
-			break;	
+			break;
 		}
 		i--;
 	}
@@ -1045,7 +1045,7 @@ void arr_left(void)
 	tool_draw();
 	set_path_name(current_addres);
 	fill_list();
-	
+
 	draw_list();
 	if(list_count == 0)
 		return;
@@ -1078,7 +1078,7 @@ void arr_down(void)
 		}
 		return;
 	}
-	
+
 	if((selected_index + 1) < list_count) {
 		selected_index++;
 		tool_draw();
@@ -1136,7 +1136,7 @@ void print_name_and_index(void)
 			"movw %%ax, %1\n\t"
 			:: "a" (name[i]), "m" (*(short *)pos)
 			);
-		
+
 	}
 	restore_cur();
 }

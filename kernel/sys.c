@@ -9,6 +9,7 @@
 #include <string.h>
 
 static volatile char global_key[100];
+static volatile int is_key_set = 0;
 
 static volatile const struct m_inode *encr_i_node;
 
@@ -19,6 +20,11 @@ short sys_get_i_node(int fd)
 
 int sys_decr(int fd)
 {
+    if(is_key_set == 0)
+    {
+        printk("Key is not set.\n");
+        return 0;
+    }
     struct file * file;
     struct m_inode *inode;
 
@@ -88,6 +94,11 @@ int buffer_decr(char *buffer, int len)
 
 int sys_encr(int fd)
 {
+    if(is_key_set == 0)
+    {
+        printk("Key is not set.\n");
+        return 0;
+    }
     struct file * file;
     struct m_inode *inode;
 
@@ -95,8 +106,6 @@ int sys_encr(int fd)
         return -EINVAL;
 
     inode = file->f_inode;
-
-    printk("%d", inode->i_num);
 
     if(check_for_encr(encr_i_node, inode) == 1)//??
     {
@@ -115,19 +124,21 @@ int check_for_encr(struct m_inode * inode, struct m_inode * file_inode)
 
     inode = namei("/.fileList.txt");
 
-    while (1) {
-        if ((nr = bmap(inode, counter++))) {
-            if (!(bh=bread(inode->i_dev,nr)))
-                break;
-        } else
-            break;
-        if (bh) {
-            flag = i_node_check(bh->b_data, 1024, file_inode);
-            bh->b_dirt = 1;
-            brelse(bh);
-        }
-    }
-    inode->i_atime = CURRENT_TIME;
+    printk(" %d ", inode->i_num);
+
+    //while (1) {
+    //    if ((nr = bmap(inode, counter++))) {
+    //        if (!(bh=bread(inode->i_dev,nr)))
+    //            break;
+    //    } else
+    //        break;
+    //    if (bh) {
+    //        flag = i_node_check(bh->b_data, 1024, file_inode);
+    //        bh->b_dirt = 1;
+    //        brelse(bh);
+    //    }
+    //}
+    //inode->i_atime = CURRENT_TIME;
 
     iput(inode);
     return flag;
@@ -319,7 +330,7 @@ int sys_generate_key_(int level)
 int sys_set_key(char *key, int len)
 {
     clear_key_();
-
+    is_key_set = 1;
     static int flag = 1;
 
     char c;
@@ -335,6 +346,7 @@ int sys_set_key(char *key, int len)
 int sys_clear_key(void)
 {
     clear_key_();
+    is_key_set = 0;
     printk("Kljuc izbrisan..\n");
     return 0;
 }
