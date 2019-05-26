@@ -12,3 +12,4 @@ _syscall1(int,encr,int,fd);
 _syscall1(int,decr,int,fd);
 
 _syscall1(short,get_i_node,int,fd);
+

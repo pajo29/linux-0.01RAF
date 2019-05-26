@@ -145,6 +145,7 @@
 
 #define __NR_get_i_node 100
 
+
 #define _syscall0(type,name) \
 type name(void) \
 { \

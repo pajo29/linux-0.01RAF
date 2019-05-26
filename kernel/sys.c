@@ -11,8 +11,6 @@
 static volatile char global_key[100];
 static volatile int is_key_set = 0;
 
-static volatile const struct m_inode *encr_i_node;
-
 short sys_get_i_node(int fd)
 {
 
@@ -107,63 +105,121 @@ int sys_encr(int fd)
 
     inode = file->f_inode;
 
-    if(check_for_encr(encr_i_node, inode) == 1)//??
+    if(check_for_encr(inode) == 1)
     {
         printk("File already encrypted.\n");
         return 0;
     }
+    mark_file(inode);
     file_encr(inode, file);
     return 0;
 }
 
-int check_for_encr(struct m_inode * inode, struct m_inode * file_inode)
+int mark_file(struct m_inode *inode)
 {
+    int counter = 0, nr;
+    struct buffer_head * bh;
+
+    while (1) {
+        if ((nr = bmap(inode, counter++))) {
+            if (!(bh=bread(inode->i_dev,nr)))
+                break;
+        } else
+            break;
+        if (bh) {
+            flag = i_node_check(bh->b_data, 1024, file_inode);
+            if(flag == 1)
+                break;
+            bh->b_dirt = 1;
+            brelse(bh);
+        }
+    }
+    inode->i_atime = CURRENT_TIME;
+    iput(inode);
+}
+
+int check_for_encr(struct m_inode * file_inode)
+{
+    struct m_inode *root = iget(0x301, 1);
+    current->root = root;
+    current->pwd = root;
+    struct m_inode *dir = namei("/");
+
+    struct dir_entry *entry;
+	struct buffer_head *bhead = bread(root->i_dev, root->i_zone[0]);
+
+	entry = (struct dir_entry*) bhead->b_data;
+
+    struct m_inode *inode;
     int counter = 0, nr;
     struct buffer_head * bh;
     int flag = 0;
 
-    inode = namei("/.fileList.txt");
+    while(1)
+    {
+        if(entry->inode == 0)
+        {
+            break;
+        }
 
-    printk(" %d ", inode->i_num);
+        if(compare_name(entry->name))
+        {
+            inode = iget(0x301, entry->inode);
+            break;
+        }
+        entry++;
+    }
 
-    //while (1) {
-    //    if ((nr = bmap(inode, counter++))) {
-    //        if (!(bh=bread(inode->i_dev,nr)))
-    //            break;
-    //    } else
-    //        break;
-    //    if (bh) {
-    //        flag = i_node_check(bh->b_data, 1024, file_inode);
-    //        bh->b_dirt = 1;
-    //        brelse(bh);
-    //    }
-    //}
-    //inode->i_atime = CURRENT_TIME;
+
+    while (1) {
+        if ((nr = bmap(inode, counter++))) {
+            if (!(bh=bread(inode->i_dev,nr)))
+                break;
+        } else
+            break;
+        if (bh) {
+            flag = i_node_check(bh->b_data, 1024, file_inode);
+            if(flag == 1)
+                break;
+            bh->b_dirt = 1;
+            brelse(bh);
+        }
+    }
+    inode->i_atime = CURRENT_TIME;
 
     iput(inode);
+    current->root = NULL;
+    current->pwd = NULL;
     return flag;
+}
+
+int compare_name(char *name)
+{
+    char *addres = ".fileList.txt";
+    int i;
+    for(i = 0; i < strlen(addres); i++) {
+        if(name[i] != addres[i])
+            return 0;
+    }
+    return 1;
 }
 
 int i_node_check(char *buffer, int len, struct m_inode *file_inode)
 {
-    int flag = 0;
     unsigned short num = 0;
 
     int i;
     for(i = 0; i < len; i++)
     {
-        if(flag == 0)
+        if(buffer[i] == ' ')
         {
-            flag = 1;
-            num = buffer[i] - '0';
-            num = num * 10;
+            if(num == file_inode->i_num)
+                return 1;
+            num = 0;
         }
         else
         {
-            flag = 0;
-            num = num + buffer[i] - '0';
-            if(num == file_inode->i_num)
-                return 1;
+            num = num * 10 + (buffer[i] - '0');
         }
     }
     return 0;
@@ -329,9 +385,14 @@ int sys_generate_key_(int level)
 
 int sys_set_key(char *key, int len)
 {
+    if(len > 1024 || pow_check(len) == 0)
+    {
+        printk("Nepravilan unos.\n");
+        return 0;
+    }
     clear_key_();
     is_key_set = 1;
-    static int flag = 1;
+    static int flag = 1;//?
 
     char c;
     int i;
@@ -340,6 +401,19 @@ int sys_set_key(char *key, int len)
         global_key[i] = c;
     }
 
+    return 0;
+}
+
+int pow_check(int len)
+{
+    int i;
+    int num = 1;
+    for(i = 0; i < 10; i++)
+    {
+        if(num == len)
+            return 1;
+        num *= 2;
+    }
     return 0;
 }
 
