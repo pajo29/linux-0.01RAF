@@ -115,10 +115,38 @@ int sys_encr(int fd)
     return 0;
 }
 
-int mark_file(struct m_inode *inode)
+int mark_file(struct m_inode *file_inode)
 {
+    struct m_inode *root = iget(0x301, 1);
+    current->root = root;
+    current->pwd = root;
+    struct m_inode *dir = namei("/");
+
+    struct dir_entry *entry;
+	struct buffer_head *bhead = bread(root->i_dev, root->i_zone[0]);
+
+	entry = (struct dir_entry*) bhead->b_data;
+
+    struct m_inode *inode;
     int counter = 0, nr;
     struct buffer_head * bh;
+    int flag = 0;
+
+    while(1)
+    {
+        if(entry->inode == 0)
+        {
+            break;
+        }
+
+        if(compare_name(entry->name))
+        {
+            inode = iget(0x301, entry->inode);
+            break;
+        }
+        entry++;
+    }
+
 
     while (1) {
         if ((nr = bmap(inode, counter++))) {
@@ -127,15 +155,60 @@ int mark_file(struct m_inode *inode)
         } else
             break;
         if (bh) {
-            flag = i_node_check(bh->b_data, 1024, file_inode);
-            if(flag == 1)
-                break;
+            mark(bh->b_data, 1024, file_inode->i_num);
             bh->b_dirt = 1;
             brelse(bh);
+            break;
         }
     }
     inode->i_atime = CURRENT_TIME;
-    iput(inode);
+
+    //iput(inode);
+    current->root = NULL;
+    current->pwd = NULL;
+    return 0;
+}
+
+int mark(char *buffer, int len, int inode_num)
+{
+    if(buffer[0] < '0' || buffer[0] > '9')
+    {
+        inode_num = reverse_num(inode_num);
+        int counter = 0;
+        while(inode_num != 0)
+        {
+            buffer[counter++] = (inode_num % 10) + '0';
+            inode_num = inode_num / 10;
+        }
+        buffer[counter] = ' ';
+        return;
+    }
+    else
+    {
+    int counter = 0;
+    while(buffer[counter] != ' ')
+        counter++;
+
+    counter++;
+    inode_num = reverse_num(inode_num);
+        while(inode_num != 0)
+        {
+            buffer[counter++] = (inode_num % 10) + '0';
+            inode_num = inode_num / 10;
+        }
+        buffer[counter] = ' ';
+    }
+}
+
+int reverse_num(int num)
+{
+    int reverse_num = 0;
+    while(num != 0)
+    {
+        reverse_num = reverse_num * 10 + (num % 10);
+        num = num / 10;
+    }
+    return reverse_num;
 }
 
 int check_for_encr(struct m_inode * file_inode)
@@ -179,15 +252,15 @@ int check_for_encr(struct m_inode * file_inode)
             break;
         if (bh) {
             flag = i_node_check(bh->b_data, 1024, file_inode);
-            if(flag == 1)
-                break;
             bh->b_dirt = 1;
             brelse(bh);
+            if(flag == 1)
+                break;
         }
     }
     inode->i_atime = CURRENT_TIME;
 
-    iput(inode);
+    //iput(inode);
     current->root = NULL;
     current->pwd = NULL;
     return flag;
