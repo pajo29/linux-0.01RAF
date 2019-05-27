@@ -4,7 +4,7 @@ echo Copying file..
 cd ..
 mkdir tmp_hd
 sudo mount -o loop,offset=10240 hd_oldlinux.img tmp_hd
-sudo cp apps/$1 tmp_hd/root
+sudo cp apps/$1 tmp_hd
 sudo umount tmp_hd
 rmdir tmp_hd
 echo Completed.
