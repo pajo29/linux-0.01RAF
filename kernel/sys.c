@@ -31,11 +31,123 @@ int sys_decr(int fd)
 
     inode = file->f_inode;
 
+    if(check_for_encr(inode) == 0)
+    {
+        printk("File not encrypted.\n");
+        return 1;
+    }
+
+    remove_file_mark(inode);
     file_decr(inode, file);
     return 0;
 }
 
-int file_decr(struct m_inode * inode, struct file * filp, char * buf, int count)
+int remove_file_mark(struct m_inode *file_inode)
+{
+    struct m_inode *root = iget(0x301, 1);
+    current->root = root;
+    current->pwd = root;
+    struct m_inode *dir = namei("/");
+
+    struct dir_entry *entry;
+    struct buffer_head *bhead = bread(root->i_dev, root->i_zone[0]);
+
+    entry = (struct dir_entry*) bhead->b_data;
+
+    struct m_inode *inode;
+    int counter = 0, nr;
+    struct buffer_head * bh;
+    int flag = 0;
+
+    while(1)
+    {
+        if(entry->inode == 0)
+        {
+            break;
+        }
+
+        if(compare_name(entry->name))
+        {
+            inode = iget(0x301, entry->inode);
+            break;
+        }
+        entry++;
+    }
+
+
+    while (1) {
+        if ((nr = bmap(inode, counter++))) {
+            if (!(bh=bread(inode->i_dev,nr)))
+                break;
+        } else
+            break;
+        if (bh) {
+            unmark(bh->b_data, 1024, file_inode->i_num);
+            bh->b_dirt = 1;
+            brelse(bh);
+            break;
+        }
+    }
+    inode->i_atime = CURRENT_TIME;
+
+    //iput(inode);
+    current->root = NULL;
+    current->pwd = NULL;
+    return 0;
+}
+
+int unmark(char *buffer, int len, int inode_num)
+{
+    int counter = 0;
+    int tmp = reverse_num(inode_num);
+    int num_count = 0;
+
+
+    int found;
+    char c;
+    while(1)
+    {
+        found = 1;
+        while(tmp != 0)
+        {
+            c = (tmp % 10) + '0';
+            tmp = tmp / 10;
+            num_count++;
+            if(c != buffer[counter++])
+                found = 0;
+        }
+        counter++;
+        if(found = 1 || counter >= len)
+            break;
+    }
+
+    if(found == 1)
+    {
+        char old_buffer[len];
+        copy_to_buffer(old_buffer, buffer, len);
+        int found_mark = --counter - num_count;
+
+        int i, j = 0;
+        for(i = 0; i < len; i++)
+        {
+            if(i < found_mark || i > counter)
+                buffer[i] = old_buffer[j++];
+            else
+            {
+                j = j + num_count + 1;
+                while(i <= counter)
+                {
+                    buffer[i++] = old_buffer[j++];
+                }
+                i--;
+            }
+        }
+    }
+
+    return 0;
+}
+
+int file_decr(struct m_inode *inode, struct file *filp, char *buf, int count)
 {
     int chars,nr;
 	struct buffer_head * bh;
@@ -186,8 +298,18 @@ int mark(char *buffer, int len, int inode_num)
     else
     {
     int counter = 0;
-    while(buffer[counter] != ' ')
-        counter++;
+    int set = 0;
+    while(set != 1)
+    {
+        set = 1;
+        while(buffer[counter] != ' ')
+            counter++;
+        if(buffer[counter + 1] != ' ')
+        {
+            set = 0;
+            counter++;
+        }
+    }
 
     counter++;
     inode_num = reverse_num(inode_num);
