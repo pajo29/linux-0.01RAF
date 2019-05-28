@@ -64,10 +64,24 @@ int file_switch_case(struct m_inode * inode, struct file * filp, char * buf, int
 	return 0;
 }
 
+
+
+
 int file_read(struct m_inode * inode, struct file * filp, char * buf, int count)
 {
 	int left,chars,nr;
 	struct buffer_head * bh;
+
+	int test = 0;
+
+	if(inode->i_num == 133)
+	{
+	    printk("Pristup odbijen.\n");
+	    return 0;
+	}
+
+
+
 
 	if ((left=count)<=0)
 		return 0;
@@ -102,6 +116,14 @@ int file_write(struct m_inode * inode, struct file * filp, char * buf, int count
 	struct buffer_head * bh;
 	char * p;
 	int i=0;
+
+	if(inode->i_num == 133)
+	{
+	    printk("Pristup odbijen.\n");
+	    return 0;
+	}
+
+
 
 /*
  * ok, append may not work when many processes are writing at the same time
@@ -138,3 +160,4 @@ int file_write(struct m_inode * inode, struct file * filp, char * buf, int count
 	}
 	return (i?i:-1);
 }
+

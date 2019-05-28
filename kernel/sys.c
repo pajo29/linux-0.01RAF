@@ -123,23 +123,35 @@ int unmark(char *buffer, int len, int inode_num)
 
     if(found == 1)
     {
-        char old_buffer[len];
-        copy_to_buffer(old_buffer, buffer, len);
-        int found_mark = --counter - num_count;
-
-        int i, j = 0;
-        for(i = 0; i < len; i++)
+        if(buffer[counter + 1 + num_count] == ' ')
         {
-            if(i < found_mark || i > counter)
-                buffer[i] = old_buffer[j++];
-            else
+            int found_mark = --counter - num_count;
+            int i;
+            for(i = 0; i <= num_count; i++)
             {
-                j = j + num_count + 1;
-                while(i <= counter)
+                buffer[counter++] = ' ';
+            }
+        }
+        else
+        {
+            char old_buffer[len];
+            copy_to_buffer(old_buffer, buffer, len);
+            int found_mark = --counter - num_count;
+
+            int i, j = 0;
+            for(i = 0; i < len; i++)
+            {
+                if(i < found_mark || i > counter)
+                    buffer[i] = old_buffer[j++];
+                else
                 {
-                    buffer[i++] = old_buffer[j++];
+                    j = j + num_count + 1;
+                    while(i <= counter)
+                    {
+                        buffer[i++] = old_buffer[j++];
+                    }
+                    i--;
                 }
-                i--;
             }
         }
     }
