@@ -80,7 +80,10 @@ int file_read(struct m_inode * inode, struct file * filp, char * buf, int count)
 	    return 0;
 	}
 
-
+	// if(check_for_encr(inode) == 1)
+	// {
+		
+	// }
 
 
 	if ((left=count)<=0)
