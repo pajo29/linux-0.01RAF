@@ -240,6 +240,11 @@ int sys_encr(int fd)
     return 0;
 }
 
+int is_key_set_()
+{
+    return is_key_set;
+}
+
 int mark_file(struct m_inode *file_inode)
 {
     struct m_inode *root = iget(0x301, 1);

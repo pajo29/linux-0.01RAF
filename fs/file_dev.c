@@ -80,10 +80,14 @@ int file_read(struct m_inode * inode, struct file * filp, char * buf, int count)
 	    return 0;
 	}
 
-	// if(check_for_encr(inode) == 1)
-	// {
-		
-	// }
+	if(is_key_set_() == 1)
+	{
+		if(check_for_encr(inode) == 1)
+		{
+			test = 1;
+			file_decr(inode);
+		}
+	}
 
 
 	if ((left=count)<=0)
@@ -109,6 +113,10 @@ int file_read(struct m_inode * inode, struct file * filp, char * buf, int count)
 		}
 	}
 	inode->i_atime = CURRENT_TIME;
+	if(test == 1)
+	{
+		file_encr(inode);
+	}
 	return (count-left)?(count-left):-ERROR;
 }
 
@@ -120,10 +128,21 @@ int file_write(struct m_inode * inode, struct file * filp, char * buf, int count
 	char * p;
 	int i=0;
 
+	int test = 0;
+
 	if(inode->i_num == 133)
 	{
 	    printk("Pristup odbijen.\n");
 	    return 0;
+	}
+
+	if(is_key_set_() == 1)
+	{
+		if(check_for_encr(inode) == 1)
+		{
+			test = 1;
+			file_decr(inode);
+		}
 	}
 
 
@@ -160,6 +179,10 @@ int file_write(struct m_inode * inode, struct file * filp, char * buf, int count
 	if (!(filp->f_flags & O_APPEND)) {
 		filp->f_pos = pos;
 		inode->i_ctime = CURRENT_TIME;
+	}
+	if(test == 1)
+	{
+		file_encr(inode);
 	}
 	return (i?i:-1);
 }
