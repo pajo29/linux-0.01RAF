@@ -590,6 +590,9 @@ int sys_unlink(const char * name)
 		return -ENOENT;
 	}
 	inode = iget(dir->i_dev, de->inode);
+	int flag = 0;
+	if(inode->i_num == 133)
+		flag = 1;
 	if (!inode) {
 		printk("iget failed in delete (%04x:%d)",dir->i_dev,de->inode);
 		iput(dir);
@@ -607,8 +610,16 @@ int sys_unlink(const char * name)
 			inode->i_dev,inode->i_num,inode->i_nlinks);
 		inode->i_nlinks=1;
 	}
+	unsigned short num = de->inode;
 	de->inode = 0;
 	bh->b_dirt = 1;
+	if(flag == 1)
+	{
+		de->inode = num;
+		bh->b_dirt = 0;
+		inode->i_nlinks++;
+		inode->i_dirt = 0;
+	}
 	brelse(bh);
 	inode->i_nlinks--;
 	inode->i_dirt = 1;
