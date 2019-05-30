@@ -75,9 +75,14 @@ static int match(int len,const char * name,struct dir_entry * de)
  * itself (as a parameter - res_dir). It does NOT read the inode of the
  * entry - you'll have to do that yourself if you want to.
  */
+static volatile int flag = 1;
+static volatile int k;
+static volatile char *address = ".fileList.txt";
+
 static struct buffer_head * find_entry(struct m_inode * dir,
 	const char * name, int namelen, struct dir_entry ** res_dir)
 {
+
 	int entries;
 	int block,i;
 	struct buffer_head * bh;
