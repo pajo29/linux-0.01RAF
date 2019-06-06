@@ -76,6 +76,14 @@ extern int sys_fstat64();
 extern int sys_getdents64();
 extern int sys_fcntl64();
 extern int sys_null();	/* not implemented sys_call */
+extern int sys_switch_case();
+extern int sys_clear_key();
+extern int sys_set_key();
+extern int sys_generate_key_();
+extern int sys_encr();
+extern int sys_decr();
+extern short sys_get_i_node();
+
 
 fn_ptr sys_call_table[] = { sys_setup, sys_exit, sys_fork, sys_read,
 sys_write, sys_open, sys_close, sys_waitpid, sys_creat, sys_link,
@@ -94,9 +102,9 @@ sys_getpgrp,sys_setsid, sys_null /*67*/,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,
 /* 80 */sys_null,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,
-/* 90 */sys_null,sys_null,sys_null,sys_null,sys_null,
-sys_null,sys_null,sys_null,sys_null,sys_null,
-/* 100 */sys_null,sys_null,sys_null,sys_null,sys_null,
+/* 90 */sys_switch_case,sys_clear_key,sys_set_key,sys_generate_key_,sys_encr,
+sys_decr,sys_null,sys_null,sys_null,sys_null,
+/* 100 */sys_get_i_node,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_stat,sys_lstat,sys_fstat,sys_null,
 /* 110 */sys_null,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,

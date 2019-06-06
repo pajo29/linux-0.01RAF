@@ -10,6 +10,10 @@
 
 struct buffer_head* read_file_block(struct m_inode * inode,int block_num);
 
+static volatile char *address = ".fileList.txt";
+static volatile int flag;
+static volatile int k;
+
 static int minix_getdents(struct m_inode * inode, struct file * filp,
 	struct dirent * dirent, int count)
 {
@@ -34,6 +38,16 @@ static int minix_getdents(struct m_inode * inode, struct file * filp,
 			de = (struct dir_entry *) (offset + bh->b_data);
 			offset += sizeof(struct dir_entry);//info->s_dirsize; 
 			filp->f_pos += sizeof(struct dir_entry);
+
+			flag = 1;
+			for(k = 0; k < 13; k++)
+			{
+				if(address[k] != de->name[k])
+					flag = 0;
+			}
+
+			if(flag == 0)
+			{
 			if (de->inode) {
 				for (i = 0; i < NAME_LEN; i++)
 					if ((c = de->name[i]) != 0)
@@ -48,6 +62,7 @@ static int minix_getdents(struct m_inode * inode, struct file * filp,
 					return i;
 				}
 			}
+		}
 		}
 		brelse(bh);
 	}

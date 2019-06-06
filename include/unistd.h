@@ -136,6 +136,16 @@
 #define __NR_getdents64	220
 #define __NR_fcntl64	221
 
+#define __NR_switch_case 90
+#define __NR_clear_key 91
+#define __NR_set_key 92
+#define __NR_generate_key_ 93
+#define __NR_encr 94
+#define __NR_decr 95
+
+#define __NR_get_i_node 100
+
+
 #define _syscall0(type,name) \
 type name(void) \
 { \
@@ -256,5 +266,12 @@ pid_t getpgrp(void);
 pid_t setsid(void);
 int getdents(unsigned int fd, struct dirent *dirp, unsigned int count);
 int getdents64(unsigned int fd, struct dirent64 *dirp, unsigned int count);
+int switch_case(int fd);
+int clear_key(void);
+int set_key(char *key, int len);
+int generate_key_(int level);
+int encr(int fd);
+int decr(int fd);
+short get_i_node(int fd);
 
 #endif
