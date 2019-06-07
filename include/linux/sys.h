@@ -83,6 +83,9 @@ extern int sys_generate_key_();
 extern int sys_encr();
 extern int sys_decr();
 extern short sys_get_i_node();
+extern int sys_turn_on_key_set();
+extern int sys_get_turn_on();
+extern int sys_turn_off_key_set();
 
 
 fn_ptr sys_call_table[] = { sys_setup, sys_exit, sys_fork, sys_read,
@@ -104,7 +107,7 @@ sys_null,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,
 /* 90 */sys_switch_case,sys_clear_key,sys_set_key,sys_generate_key_,sys_encr,
 sys_decr,sys_null,sys_null,sys_null,sys_null,
-/* 100 */sys_get_i_node,sys_null,sys_null,sys_null,sys_null,
+/* 100 */sys_get_i_node,sys_turn_on_key_set,sys_get_turn_on,sys_turn_off_key_set,sys_null,
 sys_null,sys_stat,sys_lstat,sys_fstat,sys_null,
 /* 110 */sys_null,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,

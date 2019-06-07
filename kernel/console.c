@@ -426,18 +426,24 @@ void con_write(struct tty_struct * tty)
 						pos -= columns<<1;
 						lf();
 					}
+					if(get_turn_on() == 0) {
 					__asm__("movb attr,%%ah\n\t"
 						"movw %%ax,%1\n\t"
 						::"a" (c),"m" (*(short *)pos)
 						/*:"ax"*/);
+					}
 					pos += 2;
 					x++;
 				} else if (c==27)
 					state=1;
-				else if (c==10 || c==11 || c==12)
+				else if (c==10 || c==11 || c==12) {
+					turn_off_key_set();
 					lf();
-				else if (c==13)
+				}
+				else if (c==13){
+					turn_off_key_set();
 					cr();
+				} 
 				else if (c==ERASE_CHAR(tty))
 					del();
 				else if (c==8) {

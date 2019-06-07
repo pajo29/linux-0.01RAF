@@ -144,6 +144,9 @@
 #define __NR_decr 95
 
 #define __NR_get_i_node 100
+#define __NR_turn_on_key_set 101
+#define __NR_get_turn_on 102
+#define __NR_turn_off_key_set 102
 
 
 #define _syscall0(type,name) \
@@ -273,5 +276,8 @@ int generate_key_(int level);
 int encr(int fd);
 int decr(int fd);
 short get_i_node(int fd);
+int turn_on_key_set(void);
+int get_turn_on(void);
+int turn_off_key_set(void);
 
 #endif

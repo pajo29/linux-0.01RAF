@@ -13,3 +13,8 @@ _syscall1(int,decr,int,fd);
 
 _syscall1(short,get_i_node,int,fd);
 
+_syscall0(int,turn_on_key_set);
+
+_syscall0(int,get_turn_on);
+
+_syscall0(int,turn_off_key_set);

@@ -8,12 +8,18 @@
 int main(char *args)
 {
     int argc = get_argc(args);
-    if(argc < 2) _exit(1);
+    if(argc > 1) _exit(1);
 
+    write(1, "Set your password:\n", strlen("Set your password:\n"));
+    turn_on_key_set();
 
-    char *key = get_argv(args, 1);
+    char buffer[1024];
+    read(0, buffer, 1024);
 
-    set_key(key, strlen(key));
+    turn_off_key_set(); 
+
+    buffer[strlen(buffer) - 1] = 0;
+    set_key(buffer, strlen(buffer));
 
     _exit(0);
 }

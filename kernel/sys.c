@@ -11,6 +11,8 @@
 static volatile char global_key[100];
 static volatile int is_key_set = 0;
 
+static volatile int key_set_turn_on = 0;
+
 short sys_get_i_node(int fd)
 {
 
@@ -595,6 +597,7 @@ int sys_generate_key_(int level)
 
 int sys_set_key(char *key, int len)
 {
+    key_set_turn_on = 0;
     if(len > 1024 || pow_check(len) == 0)
     {
         printk("Nepravilan unos.\n");
@@ -612,6 +615,22 @@ int sys_set_key(char *key, int len)
     }
 
     return 0;
+}
+
+int sys_turn_on_key_set(void) {
+
+    key_set_turn_on = 1;
+    return 0;
+}
+
+int sys_turn_off_key_set(void) {
+
+    key_set_turn_on = 0;
+    return 0;
+}
+
+int sys_get_turn_on() {
+    return key_set_turn_on;
 }
 
 int pow_check(int len)
