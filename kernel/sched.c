@@ -156,16 +156,21 @@ void wake_up(struct task_struct **p)
 	}
 }
 
+static volatile int activated_timer = 0;
 static volatile int timer = 0;
 
 void do_timer(long cpl)
 {
-	if(timer == 1500) {
-		timer = 0;
-		// clear_key(); TODO
+	if(activated_timer == 1) {
+		if(timer == 1500) {
+			timer = 0;
+			activated_timer = 0;
+			clear_key();
+		}
+		timer++;
 	}
 
-	timer++;
+	
 
 	if (cpl)
 		current->utime++;
@@ -175,6 +180,12 @@ void do_timer(long cpl)
 	current->counter=0;
 	if (!cpl) return;
 	schedule();
+}
+
+int sys_activate_timer(void) {
+
+	activated_timer = 1;
+	return 0;
 }
 
 int sys_alarm(long seconds)

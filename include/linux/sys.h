@@ -86,6 +86,7 @@ extern short sys_get_i_node();
 extern int sys_turn_on_key_set();
 extern int sys_get_turn_on();
 extern int sys_turn_off_key_set();
+extern int sys_activate_timer();
 
 
 fn_ptr sys_call_table[] = { sys_setup, sys_exit, sys_fork, sys_read,
@@ -109,7 +110,7 @@ sys_null,sys_null,sys_null,sys_null,sys_null,
 sys_decr,sys_null,sys_null,sys_null,sys_null,
 /* 100 */sys_get_i_node,sys_turn_on_key_set,sys_get_turn_on,sys_turn_off_key_set,sys_null,
 sys_null,sys_stat,sys_lstat,sys_fstat,sys_null,
-/* 110 */sys_null,sys_null,sys_null,sys_null,sys_null,
+/* 110 */sys_activate_timer,sys_null,sys_null,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,
 /* 120 */sys_null,sys_null,sys_uname,sys_null,sys_null,
 sys_null,sys_null,sys_null,sys_null,sys_null,

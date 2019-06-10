@@ -613,7 +613,7 @@ int sys_set_key(char *key, int len)
         c = get_fs_byte(key + i);
         global_key[i] = c;
     }
-
+    activate_timer();
     return 0;
 }
 
@@ -648,12 +648,12 @@ int pow_check(int len)
 
 int sys_clear_key(void)
 {
-    // if(is_key_set == 0) {
-    //     return 0; TODO
-    // }
+    if(is_key_set == 0) {
+        return 0;
+    }
     clear_key_();
     is_key_set = 0;
-    printk("Kljuc izbrisan..\n");
+    // printk("Kljuc izbrisan..\n");
     return 0;
 }
 

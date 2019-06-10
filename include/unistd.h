@@ -148,6 +148,8 @@
 #define __NR_get_turn_on 102
 #define __NR_turn_off_key_set 102
 
+#define __NR_activate_timer 110
+
 
 #define _syscall0(type,name) \
 type name(void) \
@@ -279,5 +281,6 @@ short get_i_node(int fd);
 int turn_on_key_set(void);
 int get_turn_on(void);
 int turn_off_key_set(void);
+int activate_timer(void);
 
 #endif
