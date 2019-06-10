@@ -648,6 +648,9 @@ int pow_check(int len)
 
 int sys_clear_key(void)
 {
+    // if(is_key_set == 0) {
+    //     return 0; TODO
+    // }
     clear_key_();
     is_key_set = 0;
     printk("Kljuc izbrisan..\n");

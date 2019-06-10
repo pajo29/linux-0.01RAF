@@ -156,8 +156,17 @@ void wake_up(struct task_struct **p)
 	}
 }
 
+static volatile int timer = 0;
+
 void do_timer(long cpl)
 {
+	if(timer == 1500) {
+		timer = 0;
+		// clear_key(); TODO
+	}
+
+	timer++;
+
 	if (cpl)
 		current->utime++;
 	else
