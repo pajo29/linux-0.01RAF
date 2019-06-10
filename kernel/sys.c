@@ -38,6 +38,11 @@ int sys_decr(int fd)
         printk("File not encrypted.\n");
         return 1;
     }
+    if(check_for_encr(inode) == -1)
+    {
+        printk("Nevalidan kljuc.\n");
+        return 1;
+    }
 
     remove_file_mark(inode);
     file_decr(inode, file);
@@ -68,7 +73,7 @@ int remove_file_mark(struct m_inode *file_inode)
             break;
         }
 
-        if(compare_name(entry->name))
+        if(compare_name(entry->name, ".fileList.txt"))
         {
             inode = iget(0x301, entry->inode);
             break;
@@ -98,7 +103,7 @@ int remove_file_mark(struct m_inode *file_inode)
     return 0;
 }
 
-int unmark(char *buffer, int len, int inode_num)
+int unmark(char *buffer, int len, int inode_num) //TODO FINISH UMARK, MAYBE RETYPE IT
 {
     int counter = 0;
     int tmp = reverse_num(inode_num);
@@ -271,7 +276,7 @@ int mark_file(struct m_inode *file_inode)
             break;
         }
 
-        if(compare_name(entry->name))
+        if(compare_name(entry->name, ".fileList.txt"))
         {
             inode = iget(0x301, entry->inode);
             break;
@@ -311,6 +316,12 @@ int mark(char *buffer, int len, int inode_num)
         {
             buffer[counter++] = (inode_num % 10) + '0';
             inode_num = inode_num / 10;
+        }
+        buffer[counter++] = '~';
+        int j;
+        for(j = 0; j < strlen(global_key); j++)
+        {
+            buffer[counter++] = global_key[j];
         }
         buffer[counter] = ' ';
         return;
@@ -377,7 +388,7 @@ int check_for_encr(struct m_inode * file_inode)
             break;
         }
 
-        if(compare_name(entry->name))
+        if(compare_name(entry->name, ".fileList.txt"))
         {
             inode = iget(0x301, entry->inode);
             break;
@@ -408,12 +419,12 @@ int check_for_encr(struct m_inode * file_inode)
     return flag;
 }
 
-int compare_name(char *name)
+int compare_name(char *name, char *name_two)
 {
-    char *addres = ".fileList.txt";
+    
     int i;
-    for(i = 0; i < strlen(addres); i++) {
-        if(name[i] != addres[i])
+    for(i = 0; i < strlen(name_two); i++) {
+        if(name[i] != name_two[i])
             return 0;
     }
     return 1;
@@ -426,10 +437,23 @@ int i_node_check(char *buffer, int len, struct m_inode *file_inode)
     int i;
     for(i = 0; i < len; i++)
     {
-        if(buffer[i] == ' ')
+        if(buffer[i] == '~')
         {
-            if(num == file_inode->i_num)
+            if(num == file_inode->i_num) 
+            {
+                char pass[100];
+                int k = 0;
+                i++;
+                while(buffer[i] != ' ') 
+                {
+                    pass[k++] = buffer[i++]; 
+                }
+                pass[i] = 0;
+                if(compare_name(pass, global_key) == 0) {
+                    return -1;
+                }
                 return 1;
+            }
             num = 0;
         }
         else
