@@ -74,11 +74,11 @@ int file_read(struct m_inode * inode, struct file * filp, char * buf, int count)
 
 	int test = 0;
 
-	if(inode->i_num == 133)
-	{
-	    printk("Pristup odbijen.\n");
-	    return 0;
-	}
+	// if(inode->i_num == 133)
+	// {
+	//     printk("Pristup odbijen.\n");
+	//     return 0;
+	// }
 
 	if(is_key_set_() == 1)
 	{

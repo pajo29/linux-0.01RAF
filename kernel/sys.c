@@ -103,7 +103,100 @@ int remove_file_mark(struct m_inode *file_inode)
     return 0;
 }
 
-int unmark(char *buffer, int len, int inode_num) //TODO FINISH UMARK, MAYBE RETYPE IT
+int unmark(char *buffer, int len, int inode_num)
+{
+    int counter = 0;
+    int tmp = reverse_num(inode_num);
+    int num_count = 0;
+
+    int found;
+    char c;
+    while(1)
+    {
+        num_count = 0;
+        found = 1;
+        while(tmp != 0)
+        {
+            c = (tmp % 10) + '0';
+            tmp = tmp / 10;
+            num_count++;
+            if(c != buffer[counter++])
+                found = 0;
+        }
+        counter++;
+        while(buffer[counter] != ' ')
+        {
+            counter++;
+            num_count++;
+        }
+        counter++;
+        num_count++;
+        if(found = 1 || counter >= len)
+            break;
+    }
+
+    if(found == 1)
+    {
+        int found_mark = counter - num_count;
+        found_mark--;
+
+        int k;
+        for(k = found_mark; k < (found_mark + num_count); k++) 
+        {
+            buffer[k] = ' ';
+        }
+
+        for(k = found_mark; k < (len - num_count); k++)
+        {
+            buffer[k] = buffer[k + num_count];
+        }
+
+        int p;
+        for(p = 0; p < len; p++) 
+        {
+            buffer[p] = buffer[p+1];
+        }
+
+        while(k < len)
+        {
+            buffer[k++] = ' ';
+        }
+        // if(buffer[counter + 1 + num_count] == ' ')
+        // {
+        //     int found_mark = --counter - num_count;
+        //     int i;
+        //     for(i = 0; i <= num_count; i++)
+        //     {
+        //         buffer[counter++] = ' ';
+        //     }
+        // }
+        // else
+        // {
+        //     char old_buffer[len];
+        //     copy_to_buffer(old_buffer, buffer, len);
+        //     int found_mark = --counter - num_count;
+
+        //     int i, j = 0;
+        //     for(i = 0; i < len; i++)
+        //     {
+        //         if(i < found_mark || i > counter)
+        //             buffer[i] = old_buffer[j++];
+        //         else
+        //         {
+        //             j = j + num_count + 1;
+        //             while(i <= counter)
+        //             {
+        //                 buffer[i++] = old_buffer[j++];
+        //             }
+        //             i--;
+        //         }
+        //     }
+        // }
+    }
+
+}
+
+int unmarkOld(char *buffer, int len, int inode_num) //TODO FINISH UMARK, MAYBE RETYPE IT
 {
     int counter = 0;
     int tmp = reverse_num(inode_num);
@@ -349,6 +442,12 @@ int mark(char *buffer, int len, int inode_num)
             buffer[counter++] = (inode_num % 10) + '0';
             inode_num = inode_num / 10;
         }
+        buffer[counter++] = '~';
+        int j;
+        for(j = 0; j < strlen(global_key); j++)
+        {
+            buffer[counter++] = global_key[j];
+        }
         buffer[counter] = ' ';
     }
 }
@@ -448,11 +547,16 @@ int i_node_check(char *buffer, int len, struct m_inode *file_inode)
                 {
                     pass[k++] = buffer[i++]; 
                 }
-                pass[i] = 0;
+                pass[k] = 0;
                 if(compare_name(pass, global_key) == 0) {
                     return -1;
                 }
                 return 1;
+            }
+            else
+            {
+                while(buffer[i] != ' ')
+                    i++;
             }
             num = 0;
         }
