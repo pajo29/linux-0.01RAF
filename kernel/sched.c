@@ -185,6 +185,7 @@ void do_timer(long cpl)
 int sys_activate_timer(void) {
 
 	activated_timer = 1;
+	timer = 0;
 	return 0;
 }
 

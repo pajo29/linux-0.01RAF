@@ -131,7 +131,10 @@ int unmark(char *buffer, int len, int inode_num)
         }
         counter++;
         num_count++;
-        if(found = 1 || counter >= len)
+
+    
+        tmp = reverse_num(inode_num);
+        if(found == 1 || counter >= len)
             break;
     }
 
@@ -142,56 +145,16 @@ int unmark(char *buffer, int len, int inode_num)
 
         int k;
         for(k = found_mark; k < (found_mark + num_count); k++) 
-        {
             buffer[k] = ' ';
-        }
 
         for(k = found_mark; k < (len - num_count); k++)
-        {
-            buffer[k] = buffer[k + num_count];
-        }
+                buffer[k] = buffer[k + num_count + 1];
 
-        int p;
-        for(p = 0; p < len; p++) 
-        {
-            buffer[p] = buffer[p+1];
-        }
-
+        k--;
         while(k < len)
         {
             buffer[k++] = ' ';
         }
-        // if(buffer[counter + 1 + num_count] == ' ')
-        // {
-        //     int found_mark = --counter - num_count;
-        //     int i;
-        //     for(i = 0; i <= num_count; i++)
-        //     {
-        //         buffer[counter++] = ' ';
-        //     }
-        // }
-        // else
-        // {
-        //     char old_buffer[len];
-        //     copy_to_buffer(old_buffer, buffer, len);
-        //     int found_mark = --counter - num_count;
-
-        //     int i, j = 0;
-        //     for(i = 0; i < len; i++)
-        //     {
-        //         if(i < found_mark || i > counter)
-        //             buffer[i] = old_buffer[j++];
-        //         else
-        //         {
-        //             j = j + num_count + 1;
-        //             while(i <= counter)
-        //             {
-        //                 buffer[i++] = old_buffer[j++];
-        //             }
-        //             i--;
-        //         }
-        //     }
-        // }
     }
 
 }
