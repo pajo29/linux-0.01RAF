@@ -6,7 +6,9 @@
 #include <asm/segment.h>
 #include <sys/times.h>
 #include <sys/utsname.h>
+#include <sys/stat.h>
 #include <string.h>
+
 
 // static volatile int hashedGlobalKey = 0;
 static volatile char global_key[100];
@@ -302,15 +304,6 @@ int sys_encr(int fd)
     }
     mark_file(inode);
 
-    if(S_ISDIR(inode->i_mode))
-    {
-        printk("THIS IS A DIR");
-        return 0;
-    }
-    else
-        printk("THIS IS NOT A DIR");
-
-
     file_encr(inode, file);
     return 0;
 }
@@ -555,6 +548,8 @@ int file_encr(struct m_inode * inode, struct file * filp, char * buf, int count)
     int left,chars,nr;
 	struct buffer_head * bh;
 
+    struct dir_entry *entry;
+
     int counter = 0;
 
 	while (1) {
@@ -564,7 +559,25 @@ int file_encr(struct m_inode * inode, struct file * filp, char * buf, int count)
         } else
             break;
         if (bh) {
-            buffer_encr(bh->b_data, 1024);
+            entry = (struct dir_entry*) bh->b_data;
+
+            while(1)
+            {
+                if(entry->inode == 0)
+                    break;
+
+                if(entry->name[0] != '.')
+                {
+                    struct m_inode *node;
+                    node = iget(0x301, entry->inode);
+                    printk("NASO SAM DIJETE\n");
+                    file_encr(node, NULL, NULL, NULL);
+                    iput(node);
+                 }
+                 entry++;
+            }
+
+            // buffer_encr(bh->b_data, 1024);
             bh->b_dirt = 1;
             brelse(bh);
         }

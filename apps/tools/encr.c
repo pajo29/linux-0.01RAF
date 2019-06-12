@@ -14,7 +14,7 @@ int main(char *args)
     if(argc > 2)
         write(1, "Previse argumenata, prihvata se samo prvi argument.\n", strlen("Previse argumenata, prihvata se samo prvi argument.\n"));
 
-    int fd = open(get_argv(args, 1), O_RDWR);
+    int fd = open(get_argv(args, 1), O_RDONLY);
     encr(fd);
     close(fd);
     _exit(0);
