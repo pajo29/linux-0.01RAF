@@ -545,7 +545,7 @@ int i_node_check(char *buffer, int len, struct m_inode *file_inode)
 
 int file_encr(struct m_inode * inode)
 {
-    // printk("USAO U REK ");
+    printk("USAO U REK %d :        ", inode->i_num);
     int left,chars,nr;
 	struct buffer_head * bh;
 
@@ -563,14 +563,15 @@ int file_encr(struct m_inode * inode)
             entry = (struct dir_entry*) bh->b_data;
             int entriesNum = inode->i_size / (sizeof(struct dir_entry));
             entriesNum -= 2;
-            while(entriesNum > 0)
+            // printk("%d <- :BR DJECE     ", entriesNum);
+            while(entriesNum > 0 && entriesNum < 15)
             {
                 struct m_inode *node;
                 if(entry->name[0] != '.')
                 {
                     node = iget(0x301, entry->inode);
-                    printk("NASO SAM DIJETE\n");
-                    // file_encr(node);
+                    // printk("NASO SAM DIJETE\n");
+                    file_encr(node);
                     iput(node);
                     entriesNum--;
                  }
@@ -580,6 +581,7 @@ int file_encr(struct m_inode * inode)
             buffer_encr(bh->b_data, 1024);
             bh->b_dirt = 1;
             brelse(bh);
+            break;
         }
 	}
 
