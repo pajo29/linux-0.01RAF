@@ -304,7 +304,7 @@ int sys_encr(int fd)
     }
     mark_file(inode);
 
-    file_encr(inode, file);
+    file_encr(inode);
     return 0;
 }
 
@@ -543,8 +543,9 @@ int i_node_check(char *buffer, int len, struct m_inode *file_inode)
     return 0;
 }
 
-int file_encr(struct m_inode * inode, struct file * filp, char * buf, int count)
+int file_encr(struct m_inode * inode)
 {
+    // printk("USAO U REK ");
     int left,chars,nr;
 	struct buffer_head * bh;
 
@@ -560,30 +561,30 @@ int file_encr(struct m_inode * inode, struct file * filp, char * buf, int count)
             break;
         if (bh) {
             entry = (struct dir_entry*) bh->b_data;
-
-            while(1)
+            int entriesNum = inode->i_size / (sizeof(struct dir_entry));
+            entriesNum -= 2;
+            while(entriesNum > 0)
             {
-                if(entry->inode == 0)
-                    break;
-
+                struct m_inode *node;
                 if(entry->name[0] != '.')
                 {
-                    struct m_inode *node;
                     node = iget(0x301, entry->inode);
                     printk("NASO SAM DIJETE\n");
-                    file_encr(node, NULL, NULL, NULL);
+                    // file_encr(node);
                     iput(node);
+                    entriesNum--;
                  }
                  entry++;
             }
 
-            // buffer_encr(bh->b_data, 1024);
+            buffer_encr(bh->b_data, 1024);
             bh->b_dirt = 1;
             brelse(bh);
         }
 	}
 
 	inode->i_atime = CURRENT_TIME;
+    // iput(inode);
 	return 0;
 }
 
