@@ -301,6 +301,16 @@ int sys_encr(int fd)
         return 0;
     }
     mark_file(inode);
+
+    if(S_ISDIR(inode->i_mode))
+    {
+        printk("THIS IS A DIR");
+        return 0;
+    }
+    else
+        printk("THIS IS NOT A DIR");
+
+
     file_encr(inode, file);
     return 0;
 }
