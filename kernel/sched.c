@@ -162,14 +162,13 @@ static volatile int timer = 0;
 void do_timer(long cpl)
 {
 	if(activated_timer == 1) {
-		if(timer == 1500) {
+		if(timer == 12000) {
 			timer = 0;
 			activated_timer = 0;
 			clear_key();
 		}
 		timer++;
 	}
-
 	
 
 	if (cpl)

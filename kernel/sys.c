@@ -8,8 +8,10 @@
 #include <sys/utsname.h>
 #include <string.h>
 
+// static volatile int hashedGlobalKey = 0;
 static volatile char global_key[100];
 static volatile int is_key_set = 0;
+
 
 static volatile int key_set_turn_on = 0;
 
@@ -293,7 +295,7 @@ int sys_encr(int fd)
 
     inode = file->f_inode;
 
-    if(check_for_encr(inode) == 1)
+    if(check_for_encr(inode) == 1 || check_for_encr(inode) == -1)
     {
         printk("File already encrypted.\n");
         return 0;
@@ -374,12 +376,16 @@ int mark(char *buffer, int len, int inode_num)
             inode_num = inode_num / 10;
         }
         buffer[counter++] = '~';
-        int j;
-        for(j = 0; j < strlen(global_key); j++)
+
+        int hashedGlobalKey = reverse_num(hash(global_key));
+        while(hashedGlobalKey != 0)
         {
-            buffer[counter++] = global_key[j];
+            buffer[counter++] = (hashedGlobalKey % 10) + '0';
+            hashedGlobalKey /= 10;
         }
+
         buffer[counter] = ' ';
+
         return;
     }
     else
@@ -406,11 +412,14 @@ int mark(char *buffer, int len, int inode_num)
             inode_num = inode_num / 10;
         }
         buffer[counter++] = '~';
-        int j;
-        for(j = 0; j < strlen(global_key); j++)
+
+        int hashedGlobalKey = reverse_num(hash(global_key));
+        while(hashedGlobalKey != 0)
         {
-            buffer[counter++] = global_key[j];
+            buffer[counter++] = (hashedGlobalKey % 10) + '0';
+            hashedGlobalKey /= 10;
         }
+
         buffer[counter] = ' ';
     }
 }
@@ -469,7 +478,7 @@ int check_for_encr(struct m_inode * file_inode)
             flag = i_node_check(bh->b_data, 1024, file_inode);
             bh->b_dirt = 1;
             brelse(bh);
-            if(flag == 1)
+            if(flag == 1 || flag == -1 || flag == 0)
                 break;
         }
     }
@@ -503,15 +512,15 @@ int i_node_check(char *buffer, int len, struct m_inode *file_inode)
         {
             if(num == file_inode->i_num) 
             {
-                char pass[100];
+                int pass = 0;
                 int k = 0;
                 i++;
                 while(buffer[i] != ' ') 
                 {
-                    pass[k++] = buffer[i++]; 
+                    pass = (pass * 10) + (buffer[i++] - '0');
                 }
-                pass[k] = 0;
-                if(compare_name(pass, global_key) == 0) {
+
+                if(hash(global_key) != pass) {
                     return -1;
                 }
                 return 1;
@@ -698,15 +707,29 @@ int sys_set_key(char *key, int len)
     is_key_set = 1;
     static int flag = 1;//?
 
-    char c;
+    char c, kerKey[100];
     int i;
     for(i = 0; i < len; i++) {
         c = get_fs_byte(key + i);
-        global_key[i] = c;
+        kerKey[i] = c;
     }
+
     activate_timer();
     return 0;
 }
+
+int hash(char *str) 
+{
+    int hash = 5381;
+    int c;
+
+    while(c = *str++)
+        hash = ((hash << 5) + hash) + c;
+
+    return hash;
+}
+
+
 
 int sys_turn_on_key_set(void) {
 
