@@ -226,7 +226,7 @@ int unmarkOld(char *buffer, int len, int inode_num) //TODO FINISH UMARK, MAYBE R
     return 0;
 }
 
-int file_decr(struct m_inode *inode, struct file *filp, char *buf, int count)
+int file_decr(struct m_inode *inode)
 {
     int chars,nr;
 	struct buffer_head * bh;
@@ -240,6 +240,7 @@ int file_decr(struct m_inode *inode, struct file *filp, char *buf, int count)
         } else
             break;
         if (bh) {
+            buffer_decr(bh->b_data, 1024);
             if(S_ISDIR(inode->i_mode)) {
             struct dir_entry *entry = (struct dir_entry*) bh->b_data;
             int entries = inode->i_size / (sizeof(struct dir_entry));
@@ -260,7 +261,6 @@ int file_decr(struct m_inode *inode, struct file *filp, char *buf, int count)
             }
 
             }
-            buffer_decr(bh->b_data, 1024);
             bh->b_dirt = 1;
             brelse(bh);
         }
@@ -577,6 +577,8 @@ int i_node_check(char *buffer, int len, struct m_inode *file_inode)
 
 int file_encr(struct m_inode * inode)
 {
+    printk(global_key);
+    printk(": GLOBALNI KLJUC\n"); //KOJI KURAC??
     int left,chars,nr;
 	struct buffer_head * bh;
 
