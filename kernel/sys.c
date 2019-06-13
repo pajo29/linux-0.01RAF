@@ -48,7 +48,7 @@ int sys_decr(int fd)
         return 1;
     }
 
-    remove_file_mark(inode);
+    
     file_decr(inode, file);
     return 0;
 }
@@ -240,6 +240,26 @@ int file_decr(struct m_inode *inode, struct file *filp, char *buf, int count)
         } else
             break;
         if (bh) {
+            if(S_ISDIR(inode->i_mode)) {
+            struct dir_entry *entry = (struct dir_entry*) bh->b_data;
+            int entries = inode->i_size / (sizeof(struct dir_entry));
+            entries -= 2;
+            // printk("%d : entries  ", entries);
+            entry++;
+            entry++;
+            while(entries > 0) {
+                struct m_inode *node;
+
+                if(entry->name[0] != '.') {
+                node = iget(0x301, entry->inode);
+                file_decr(node);
+                iput(node);
+                entries--;
+            }
+                entry++;
+            }
+
+            }
             buffer_decr(bh->b_data, 1024);
             bh->b_dirt = 1;
             brelse(bh);
@@ -248,6 +268,7 @@ int file_decr(struct m_inode *inode, struct file *filp, char *buf, int count)
 
 
 	inode->i_atime = CURRENT_TIME;
+    remove_file_mark(inode);
 	return 0;
 }
 
