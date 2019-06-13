@@ -770,7 +770,7 @@ int sys_set_key(char *key, int len)
     int i;
     for(i = 0; i < len; i++) {
         c = get_fs_byte(key + i);
-        kerKey[i] = c;
+        global_key[i] = c;
     }
 
     activate_timer();
