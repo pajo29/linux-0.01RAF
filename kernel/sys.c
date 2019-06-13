@@ -318,15 +318,9 @@ int sys_encr(int fd)
 
     inode = file->f_inode;
 
-    if(check_for_encr(inode) == 1)
+    if(check_for_encr(inode) == 1 || check_for_encr(inode) == -1)
     {
         printk("File already encrypted.\n");
-        return 0;
-    }
-
-    if(check_for_encr(inode) == -1)
-    {
-        printk("Wrong key.\n");
         return 0;
     }
     
@@ -408,6 +402,7 @@ int mark(char *buffer, int len, int inode_num)
         buffer[counter++] = '~';
 
         int hashedGlobalKey = reverse_num(hash(global_key));
+        printk("%d ", hashedGlobalKey);
         while(hashedGlobalKey != 0)
         {
             buffer[counter++] = (hashedGlobalKey % 10) + '0';
@@ -550,12 +545,7 @@ int i_node_check(char *buffer, int len, struct m_inode *file_inode)
                     pass = (pass * 10) + (buffer[i++] - '0');
                 }
 
-                printk("%d : %d\n", pass, hash(global_key));
-                printk(global_key);
-                printk("\n");
-
                 if(hash(global_key) != pass) {
-                    printk("JEL SE OVO DESILO");
                     return -1;
                 }
                 return 1;
@@ -577,8 +567,6 @@ int i_node_check(char *buffer, int len, struct m_inode *file_inode)
 
 int file_encr(struct m_inode * inode)
 {
-    printk(global_key);
-    printk(": GLOBALNI KLJUC\n"); //KOJI KURAC??
     int left,chars,nr;
 	struct buffer_head * bh;
 
@@ -784,6 +772,7 @@ int hash(char *str)
 
     while(c = *str++)
         hash = ((hash << 5) + hash) + c;
+
 
     return hash;
 }
