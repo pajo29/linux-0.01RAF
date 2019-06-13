@@ -297,12 +297,18 @@ int sys_encr(int fd)
 
     inode = file->f_inode;
 
-    if(check_for_encr(inode) == 1 || check_for_encr(inode) == -1)
+    if(check_for_encr(inode) == 1)
     {
         printk("File already encrypted.\n");
         return 0;
     }
-    mark_file(inode);
+
+    if(check_for_encr(inode) == -1)
+    {
+        printk("Wrong key.\n");
+        return 0;
+    }
+    
 
     file_encr(inode);
     return 0;
@@ -523,7 +529,12 @@ int i_node_check(char *buffer, int len, struct m_inode *file_inode)
                     pass = (pass * 10) + (buffer[i++] - '0');
                 }
 
+                printk("%d : %d\n", pass, hash(global_key));
+                printk(global_key);
+                printk("\n");
+
                 if(hash(global_key) != pass) {
+                    printk("JEL SE OVO DESILO");
                     return -1;
                 }
                 return 1;
@@ -545,11 +556,8 @@ int i_node_check(char *buffer, int len, struct m_inode *file_inode)
 
 int file_encr(struct m_inode * inode)
 {
-    printk("USAO U REK %d :        ", inode->i_num);
     int left,chars,nr;
 	struct buffer_head * bh;
-
-    struct dir_entry *entry;
 
     int counter = 0;
 
@@ -560,33 +568,35 @@ int file_encr(struct m_inode * inode)
         } else
             break;
         if (bh) {
-            entry = (struct dir_entry*) bh->b_data;
-            int entriesNum = inode->i_size / (sizeof(struct dir_entry));
-            entriesNum -= 2;
-            // printk("%d <- :BR DJECE     ", entriesNum);
-            while(entriesNum > 0 && entriesNum < 15)
-            {
+            if(S_ISDIR(inode->i_mode)) {
+            printk("USAO U DIR");
+            struct dir_entry *entry = (struct dir_entry*) bh->b_data;
+            int entries = inode->i_size / (sizeof(struct dir_entry));
+            entries -= 2;
+            // printk("%d : entries  ", entries);
+            entry++;
+            entry++;
+            while(entries > 0) {
                 struct m_inode *node;
-                if(entry->name[0] != '.')
-                {
-                    node = iget(0x301, entry->inode);
-                    // printk("NASO SAM DIJETE\n");
-                    file_encr(node);
-                    iput(node);
-                    entriesNum--;
-                 }
-                 entry++;
+
+                if(entry->name[0] != '.') {
+                node = iget(0x301, entry->inode);
+                file_encr(node);
+                iput(node);
+                entries--;
+            }
+                entry++;
             }
 
+            }
             buffer_encr(bh->b_data, 1024);
             bh->b_dirt = 1;
             brelse(bh);
-            break;
+            // break;
         }
 	}
-
-	inode->i_atime = CURRENT_TIME;
-    // iput(inode);
+    inode->i_atime = CURRENT_TIME;
+    mark_file(inode);
 	return 0;
 }
 

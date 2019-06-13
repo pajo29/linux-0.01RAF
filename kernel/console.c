@@ -574,7 +574,8 @@ void con_write(struct tty_struct * tty)
 				}
 		}
 	}
-	set_cursor();
+	if(get_turn_on() == 0)
+		set_cursor();
 }
 
 /*
